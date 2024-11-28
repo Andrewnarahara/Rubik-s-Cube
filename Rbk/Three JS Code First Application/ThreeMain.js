@@ -1,7 +1,20 @@
 import * as THREE from 'three';
 
+//The proportion of the window width and height the canvas will take up
+const windowWidthPercentageForCanvas = 0.3;
+const windowHeightPercentageForCanvas = 0.3;
+
+//Constants for colors
+const greenColor = 0x009b48;
+const blueColor = 0x0046ad;
+const whiteColor = 0xffffff;
+const redColor = 0xb71234;
+const orangeColor = 0xff5800;
+const yellowColor = 0xffd500;
+
+
 var scene;
-const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+var camera;
 var renderer;
 
 var cube = createCube();
@@ -22,12 +35,12 @@ function animate() {
 function createCube() {
 	
 	var cubeMaterials = [
-		new THREE.MeshBasicMaterial({color:0x2173fd}),
-		new THREE.MeshBasicMaterial({color:0xd5d918}),
-		new THREE.MeshBasicMaterial({color:0xd2dbeb}),
-		new THREE.MeshBasicMaterial({color:0xa3a3c6}),
-		new THREE.MeshBasicMaterial({color:0xfe6b9f}),
-		new THREE.MeshBasicMaterial({color:0x856af9})
+		new THREE.MeshBasicMaterial({color:greenColor}),
+		new THREE.MeshBasicMaterial({color:blueColor}),
+		new THREE.MeshBasicMaterial({color:redColor}),
+		new THREE.MeshBasicMaterial({color:orangeColor}),
+		new THREE.MeshBasicMaterial({color:whiteColor}),
+		new THREE.MeshBasicMaterial({color:redColor})
 	];
 
 	var cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
@@ -40,60 +53,44 @@ function createCube() {
 
 function startScene(cube) {
 	
-	/*
-	var canvas = document.getElementById(cubeCanvas);
-	render = new THREE.WebGLRenderer();
+	// camera.position.set(0, 0, 0);
+	// camera.lookAt(scene.position);
+	// scene.add(camera);
 
-	render.setClearColor(0x000000, 1);
+	// cube.position.set(0, 0, -7.0);
 
-	var canvasWidth = canvas.getAttribute('width');
-	var canvasHeight = canvas.getAttribute('height');
-	render.setSize(canvasWidth, canvasHeight);
-
-	canvas.appendChild(render.domElement);
-
-	scene = new THREE.Scene();
+	
+	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
+	var canvasHeight = window.innerHeight * windowHeightPercentageForCanvas;
+	
 	var aspect = canvasWidth / canvasHeight;
-
-	camera = new THREE.PerspectiveCamera(45, aspect);
-	camera.position.set(0, 0, 0);
-	camera.lookAt(scene.position);
-	scene.add(camera);
-
-	cube.position.set(0, 0, -7.0);
-	scene.add(cube);
-	*/
-	//var canvas = document.getElementById(cubeCanvas);
-	//var canvasWidth = canvas.getBoundingClientRect().width;
-	//getAttribute('width');
-	//var canvasHeight = canvas.getAttribute('height');
+	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
 	
 	renderer = new THREE.WebGLRenderer();
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.setAnimationLoop( animate );
-	document.body.appendChild( renderer.domElement );
+	renderer.setClearColor(0xCFCFCF, 1);
+	renderer.setSize(canvasWidth, canvasHeight);
+	renderer.setAnimationLoop(animateScene);
+	document.body.appendChild(renderer.domElement);
 		
 	scene = new THREE.Scene();
 
-	scene.add( cube );
+	scene.add(cube);
 	
 }
 
 
 function animateScene() {
-	/*
-	requestAnimationFrame(animateScene);
-
+	
 	cube.rotation.y += 0.01;
 	cube.rotation.x += 0.01;
 
 	renderScene();
-	*/
+	
 }
 
 function renderScene() {
 	
-	render.render(scene, camera);
+	renderer.render(scene, camera);
 	
 }
  
@@ -105,11 +102,18 @@ function renderScene() {
     animateScene();
     renderScene();
 
- }
+}
+
+//Gets an element by its id
+window.getElementById = function(element) {
+	
+	return document.getElementById(element);
+	
+}
 
 //A test function for testing things
 window.testJS = function() {
-	
+
 	document.getElementById("test").innerHTML = "changed";
 	
 }
