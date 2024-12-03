@@ -1,0 +1,6 @@
+To run:
+Open a terminal window
+Navigate to this folder
+Run npx vite build
+Run npx vite
+Open the localhost link shown
