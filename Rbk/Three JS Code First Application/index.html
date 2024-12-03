@@ -14,9 +14,44 @@
 
 	<body>
 		
+		<div id = "controlsContainer">
+			
+			<table id = "controlButtonsTable">
+				<tr>
+					<td></td>
+					<td>
+						<button id = "rotateUp" onclick = "rotateUp()">&uarr;</button>
+					</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "rotateLeft" onclick = "rotateLeft()">&larr;</button>
+					</td>
+					<td>
+						<button id = "solve" onclick = "solveCube()">Solve</button>
+					</td>
+					<td>
+						<button id = "rotateRight" onclick = "rotateRight()">&rarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<button id = "rotateDown" onclick = "rotateDown()">&darr;</button>
+					</td>
+					<td></td>
+				</tr>
+			</table>
+			
+		</div>
+		
+		<div id = "canvasContainer">
+		</div>
+		
 		<p id="test">Test</p>
 		<button onclick = "testJS()">Test Button</button>
-	
+		
 	</body>
 	
 </html>
