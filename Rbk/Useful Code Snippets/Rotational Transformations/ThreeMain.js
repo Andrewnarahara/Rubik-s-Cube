@@ -109,7 +109,27 @@ function startScene() {
 	
 	scene.add(cube);
 	
-
+	//Get it to an isometric view for better viewing
+	cube.rotation.x = Math.PI/2;
+	cube.rotation.y = Math.PI/3;
+	cube.rotation.z = Math.PI;
+	
+	
+	//Rotations to get to world angle A, B, C
+	var A = 0;//Math.PI/4;
+	var B = 0;//Math.PI/2;
+	var C = Math.PI/2;
+	
+	// cube.rotation.x = A;
+	// cube.rotation.y = B;
+	cube.rotation.z += C;
+	
+	//Need:
+		//Define a turn around a world axis (known)
+		//Starting from (0,0,0), define the new euler angles
+		//Set the cube rotation and translation positions
+		//Starting from the new euler angles, define another world axis turn
+		//Repeat
 	
 	
 	//Rotate the cube 45 degrees to show it at an isometric angle
