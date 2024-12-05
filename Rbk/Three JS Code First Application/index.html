@@ -18,29 +18,58 @@
 			
 			<table id = "controlButtonsTable">
 				<tr>
-					<td></td>
 					<td>
-						<button id = "rotateUp" onclick = "rotateUp()">&uarr;</button>
+						<button id = "leftCCW" onclick = "LeftCCW()">&uarr;</button>
 					</td>
-					<td></td>
-				</tr>
-				<tr>
+					<td>Left Face</td>
 					<td>
-						<button id = "rotateLeft" onclick = "rotateLeft()">&larr;</button>
-					</td>
-					<td>
-						<button id = "solve" onclick = "solveCube()">Solve</button>
-					</td>
-					<td>
-						<button id = "rotateRight" onclick = "rotateRight()">&rarr;</button>
+						<button id = "leftCW" onclick = "LeftCW()">&darr;</button>
 					</td>
 				</tr>
 				<tr>
-					<td></td>
 					<td>
-						<button id = "rotateDown" onclick = "rotateDown()">&darr;</button>
+						<button id = "rightCW" onclick = "RightCW()">&uarr;</button>
 					</td>
-					<td></td>
+					<td>Right Face</td>
+					<td>
+						<button id = "rightCCW" onclick = "RightCCW()">&darr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "topCW" onclick = "TopCW()">&larr;</button>
+					</td>
+					<td>Top Face</td>
+					<td>
+						<button id = "topCCW" onclick = "TopCCW()">&rarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "bottomCCW" onclick = "BottomCCW()">&larr;</button>
+					</td>
+					<td>Bottom Face</td>
+					<td>
+						<button id = "bottomCW" onclick = "BottomCW()">&rarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "frontCW" onclick = "FrontCW()">&orarr;</button>
+					</td>
+					<td>Front Face</td>
+					<td>
+						<button id = "frontCCW" onclick = "FrontCCW()">&olarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "rearCCW" onclick = "RearCCW()">&orarr;</button>
+					</td>
+					<td>Rear Face</td>
+					<td>
+						<button id = "rearCW" onclick = "RearCW()">&olarr;</button>
+					</td>
 				</tr>
 			</table>
 			

@@ -167,32 +167,89 @@ function renderScene() {
 	
 }
 
-//Rotates the cube left
-window.rotateLeft = function() {
+//Rotates the left face of the cube clockwise
+window.LeftCW = function() {
 
-	cube.rotation.y -= Math.PI / 8;
-	
+	const yAxis = new THREE.Vector3(0, 1, 0);
+	cubeArray[0][0][0].rotateOnWorldAxis(yAxis, -Math.PI/4);
+
 }
 
-//Rotates the cube right
-window.rotateRight = function() {
+//Rotates the left face of the cube counterclockwise
+window.LeftCCW = function() {
 
-	cube.rotation.y += Math.PI / 8;
 	
+
 }
 
-//Rotates the cube up
-window.rotateUp = function() {
+//Rotates the right face of the cube clockwise
+window.RightCW = function() {
 
-	cube.rotation.x -= Math.PI / 8;
 	
+
 }
 
-//Rotates the cube down
-window.rotateDown = function() {
+//Rotates the right face of the cube counterclockwise
+window.RightCCW = function() {
 
-	cube.rotation.x += Math.PI / 8;
 	
+
+}
+
+//Rotates the top face of the cube clockwise
+window.TopCW = function() {
+
+	
+
+}
+
+//Rotates the top face of the cube counterclockwise
+window.TopCCW = function() {
+
+	
+
+}
+
+//Rotates the bottom face of the cube clockwise
+window.BottomCW = function() {
+
+	
+
+}
+
+//Rotates the bottom face of the cube counterclockwise
+window.BottomCCW = function() {
+
+	
+
+}
+
+//Rotates the front face of the cube clockwise
+window.FrontCW = function() {
+
+	
+
+}
+
+//Rotates the front face of the cube counterclockwise
+window.FrontCCW = function() {
+
+	
+
+}
+
+//Rotates the rear face of the cube clockwise
+window.RearCW = function() {
+
+	
+
+}
+
+//Rotates the rear face of the cube counterclockwise
+window.RearCCW = function() {
+
+	
+
 }
 
 //Solves the cube

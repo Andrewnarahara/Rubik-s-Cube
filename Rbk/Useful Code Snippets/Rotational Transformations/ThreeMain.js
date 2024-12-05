@@ -34,9 +34,13 @@ const cubeSize = 3;
 //Array to hold the cube objects comprising the entire cube
 var cubeArray = [];
 
+//Array to hold the current Euler angles of each cube
+var cubeAngleArray = [];
+
 //Functions to set up the canvas and cube elements within it
 //setupCubeArray();
 var cube = createCube();
+cubeAngleArray = [0, 0, 0];		//Cube angles start at [0, 0, 0]
 startScene(cube);
 
 //Creates the array of cubes that define the Rubik's Cube
@@ -109,20 +113,23 @@ function startScene() {
 	
 	scene.add(cube);
 	
+	//Moves the cube position off center far better viewing of sides
+	cube.position.set(-1, -1, 0);
+	
 	//Get it to an isometric view for better viewing
-	cube.rotation.x = Math.PI/2;
-	cube.rotation.y = Math.PI/3;
-	cube.rotation.z = Math.PI;
+	// cube.rotation.x = Math.PI/2;
+	// cube.rotation.y = Math.PI/3;
+	// cube.rotation.z = Math.PI;
 	
 	
 	//Rotations to get to world angle A, B, C
-	var A = 0;//Math.PI/4;
-	var B = 0;//Math.PI/2;
-	var C = Math.PI/2;
+	// var A = 0;//Math.PI/4;
+	// var B = 0;//Math.PI/2;
+	// var C = Math.PI/2;
 	
 	// cube.rotation.x = A;
 	// cube.rotation.y = B;
-	cube.rotation.z += C;
+	//cube.rotation.z += C;
 	
 	//Need:
 		//Define a turn around a world axis (known)
@@ -179,6 +186,28 @@ window.rotateUp = function() {
 window.rotateDown = function() {
 
 	cube.rotation.x += Math.PI / 8;
+	
+}
+
+//Performs a "Front" turn on the cube
+window.Front = function() {
+
+	const myAxis = new THREE.Vector3(0, 0, 1);
+	cube.rotateOnWorldAxis(myAxis, -Math.PI/4);
+	
+}
+
+window.Left = function() {
+
+	const myAxis = new THREE.Vector3(1, 0, 0);
+	cube.rotateOnWorldAxis(myAxis, Math.PI/4);
+	
+}
+
+window.Up = function() {
+
+	const myAxis = new THREE.Vector3(0, 1, 0);
+	cube.rotateOnWorldAxis(myAxis, -Math.PI/4);
 	
 }
 
