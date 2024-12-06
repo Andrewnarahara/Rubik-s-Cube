@@ -161,8 +161,8 @@ window.leftCW = function() {
 					
 					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
 					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, -Math.PI/2);
-					cubeArray[i][j][k].position.z = newCoords[0];
-					cubeArray[i][j][k].position.y = newCoords[1];
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
 					
 				}
 				
@@ -177,36 +177,155 @@ window.leftCW = function() {
 //Rotates the left face of the cube counterclockwise
 window.leftCCW = function() {
 
-	const xAxis = new THREE.Vector3(1, 0, 0);
-	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, -Math.PI/2);
+	//Loops through all cubes, moves cubes in the left face (with the lowest X coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.x == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CCW along the X axis
+					const xAxis = new THREE.Vector3(1, 0, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the right face of the cube clockwise
 window.rightCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the right face (with the highest X coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.x == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the X axis
+					const xAxis = new THREE.Vector3(1, 0, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, -Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the right face of the cube counterclockwise
 window.rightCCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the right face (with the highest X coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.x == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CcW along the X axis
+					const xAxis = new THREE.Vector3(1, 0, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the top face of the cube clockwise
 window.topCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the top face (with the highest Y coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.y == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the Y axis
+					const yAxis = new THREE.Vector3(0, 1, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(yAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XZ plane, so its Y position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.x, -Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the top face of the cube counterclockwise
 window.topCCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the top face (with the highest Y coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.y == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CCW along the Y axis
+					const yAxis = new THREE.Vector3(0, 1, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(yAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XZ plane, so its Y position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.x, Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
@@ -267,6 +386,16 @@ function rotateCoordinate2D(xCoordinate, yCoordinate, rotationAngle) {
 
 	//Returns the new rotated coordinates
 	return [(Math.cos(angle) * magnitude), (Math.sin(angle) * magnitude)];
+	
+}
+
+//When calculating coordinate positions, we are converting from coordinates to radians (pi based, irrational) and then back to coordinates.
+//Since pi is irrational, we cannot compeltely store it in a float, and therefore there will be rounding errors on the final coordinate.
+//All coordinates should be in intervals of 1/2 due to the nature of its positioning (see Notes).
+//This function rounds the coordinate to the nearest half to smooth these rounding errors and returns the smoothed coordinate.
+function smoothCoordinate(coordinateToSmooth) {
+	
+	return Math.round(coordinateToSmooth * 2) / 2;
 	
 }
 
