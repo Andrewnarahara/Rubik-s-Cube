@@ -131,7 +131,7 @@ function startScene() {				//cube) {
 	// }
 	
 	scene.add(cubeArray[0][0][0]);
-	cubeArray[0][0][0].position.set(1, 0, 0);
+	cubeArray[0][0][0].position.set(-1, 1, 1);
 	
 	scene.add(cubeArray[0][0][1]);
 	cubeArray[0][0][1].position.set(-1, 0, 0);
@@ -170,15 +170,24 @@ function renderScene() {
 //Rotates the left face of the cube clockwise
 window.LeftCW = function() {
 
-	const yAxis = new THREE.Vector3(0, 1, 0);
-	cubeArray[0][0][0].rotateOnWorldAxis(yAxis, -Math.PI/4);
-
+	//Rotate the cube 90 degrees CW along the X axis
+	const xAxis = new THREE.Vector3(1, 0, 0);
+	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, Math.PI/4);
+	
+	//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
+	//Corners:
+	//		Y				1		-1		-1		1
+	//		Z				1		1		-1		-1
+	//		atan(Y/Z)		pi/4	
+	alert(Math.atan(cubeArray[0][0][0].position.z, cubeArray[0][0][0].position.y) / Math.PI);
+	
 }
 
 //Rotates the left face of the cube counterclockwise
 window.LeftCCW = function() {
 
-	
+	const xAxis = new THREE.Vector3(1, 0, 0);
+	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, -Math.PI/4);
 
 }
 
@@ -250,6 +259,15 @@ window.RearCCW = function() {
 
 	
 
+}
+
+//Takes in a 2D coordinate and rotates it the desired angle (in radians). Returns the new coordinate in an array
+function RotateCoordinate2D(xCoordinate, yCoordinate, rotationAngle) {
+
+	var magnitude = Math.sqrt((xCoordinate * xCoordinate) + (yCoordinate * yCoordinate));
+	var angle = Math.atan(cubeArray[0][0][0].position.z, cubeArray[0][0][0].position.y);
+	var angle += rotationAngle;
+	
 }
 
 //Solves the cube
