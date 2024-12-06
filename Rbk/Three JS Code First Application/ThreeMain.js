@@ -36,13 +36,12 @@ var cubeArray = [];
 
 //Functions to set up the canvas and cube elements within it
 setupCubeArray();
-//var cube = createCube();
-startScene();//cube);
+startScene();
 
 //Creates the array of cubes that define the Rubik's Cube
 function setupCubeArray() {
 	
-	//Loops through to create an n x n x n (3D) array of cube objects, with the inner objects being blank
+	//Loops through to create an n x n x n (3D) array of cube objects, with the inner objects being blank (not sure if that last part is necessary)
 	for (var i = 0; i < cubeSize; i++) {
 		
 		cubeArray.push([]);
@@ -53,7 +52,7 @@ function setupCubeArray() {
 			
 			for (var k = 0; k < cubeSize; k++) {
 				
-				cubeArray[i][j].push(createCube());			//!!!!!!!!!!Inner objects need to be made blank
+				cubeArray[i][j].push(createCube());			//!!!!!!!!!!Inner objects need to be made blank?
 				
 				
 			}
@@ -85,13 +84,7 @@ function createCube() {
 }
 
 //Sets up the camera, renderer, and canvas
-function startScene() {				//cube) {
-	
-	// camera.position.set(0, 0, 0);
-	// camera.lookAt(scene.position);
-	// scene.add(camera);
-
-	// cube.position.set(0, 0, -7.0);
+function startScene() {
 
 	//Define the canvas size and aspect ration based on a proportion of the window size
 	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
@@ -100,62 +93,45 @@ function startScene() {				//cube) {
 	
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
 	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	camera.position.z = 7;
+	camera.position.z = setCameraFromCubeSize();
+	camera.lookAt(0, 0, 0);
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
 	renderer = new THREE.WebGLRenderer();
 	renderer.setClearColor(0xCFCFCF, 1);
 	renderer.setSize(canvasWidth, canvasHeight);
 	renderer.setAnimationLoop(animateScene);
-	//document.body.appendChild(renderer.domElement);
 	document.getElementById("canvasContainer").appendChild(renderer.domElement);
-	
 		
-	//Create the scene and add cube
+	//Create the scene
 	scene = new THREE.Scene();
 	
-	// for (var i = 0; i < cubeSize; i++) {
+	//Loop through all cubes, add them to the scene, and set their position
+	for (var i = 0; i < cubeSize; i++) {
 				
-		// for (var j = 0; j < cubeSize; j++) {
+		for (var j = 0; j < cubeSize; j++) {
 						
-			// for (var k = 0; k < cubeSize; k++) {
+			for (var k = 0; k < cubeSize; k++) {
 				
-				// scene.add(cubeArray[i][j][k]);
-				// cubeArray[i][j][k].position.set(i - 1, j - 1, k - 1);
-
+				scene.add(cubeArray[i][j][k]);
+				cubeArray[i][j][k].position.set(i - ((cubeSize - 1) / 2), j - ((cubeSize - 1) / 2), k - ((cubeSize - 1) / 2));
 				
-			// }
+			}
 			
-		// }
+		}
 		
-	// }
-	
-	scene.add(cubeArray[0][0][0]);
-	cubeArray[0][0][0].position.set(-1, 1, 1);
-	
-	scene.add(cubeArray[0][0][1]);
-	cubeArray[0][0][1].position.set(-1, 0, 0);
-	
-	scene.add(cubeArray[0][0][2]);
-	cubeArray[0][0][2].position.set(0, 0, -1);
-	
-	scene.add(cubeArray[0][1][0]);
-	cubeArray[0][1][0].position.set(0, 1, 0);
-	
-
-	
-	
-	//Rotate the cube 45 degrees to show it at an isometric angle
-	// cube.rotation.y += Math.PI / 4;
-	// cube.rotation.x += Math.PI / 4;
+	}
 	
 }
 
+//Sets the camera Z position based on the cube size
+function setCameraFromCubeSize() {
+	
+	return cubeSize + 4;
+	
+}
 
 function animateScene() {
-	
-	// cube.rotation.y += 0.01;
-	// cube.rotation.x += 0.01;
 
 	renderScene();
 	
@@ -168,105 +144,129 @@ function renderScene() {
 }
 
 //Rotates the left face of the cube clockwise
-window.LeftCW = function() {
+window.leftCW = function() {
 
-	//Rotate the cube 90 degrees CW along the X axis
-	const xAxis = new THREE.Vector3(1, 0, 0);
-	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, Math.PI/4);
-	
-	//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
-	//Corners:
-	//		Y				1		-1		-1		1
-	//		Z				1		1		-1		-1
-	//		atan(Y/Z)		pi/4	
-	alert(Math.atan(cubeArray[0][0][0].position.z, cubeArray[0][0][0].position.y) / Math.PI);
+	//Loops through all cubes, moves cubes in the left face (with the lowest X coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.x == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the X axis
+					const xAxis = new THREE.Vector3(1, 0, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, -Math.PI/2);
+					cubeArray[i][j][k].position.z = newCoords[0];
+					cubeArray[i][j][k].position.y = newCoords[1];
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 	
 }
 
 //Rotates the left face of the cube counterclockwise
-window.LeftCCW = function() {
+window.leftCCW = function() {
 
 	const xAxis = new THREE.Vector3(1, 0, 0);
-	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, -Math.PI/4);
+	cubeArray[0][0][0].rotateOnWorldAxis(xAxis, -Math.PI/2);
 
 }
 
 //Rotates the right face of the cube clockwise
-window.RightCW = function() {
+window.rightCW = function() {
 
 	
 
 }
 
 //Rotates the right face of the cube counterclockwise
-window.RightCCW = function() {
+window.rightCCW = function() {
 
 	
 
 }
 
 //Rotates the top face of the cube clockwise
-window.TopCW = function() {
+window.topCW = function() {
 
 	
 
 }
 
 //Rotates the top face of the cube counterclockwise
-window.TopCCW = function() {
+window.topCCW = function() {
 
 	
 
 }
 
 //Rotates the bottom face of the cube clockwise
-window.BottomCW = function() {
+window.bottomCW = function() {
 
 	
 
 }
 
 //Rotates the bottom face of the cube counterclockwise
-window.BottomCCW = function() {
+window.bottomCCW = function() {
 
 	
 
 }
 
 //Rotates the front face of the cube clockwise
-window.FrontCW = function() {
+window.frontCW = function() {
 
 	
 
 }
 
 //Rotates the front face of the cube counterclockwise
-window.FrontCCW = function() {
+window.frontCCW = function() {
 
 	
 
 }
 
 //Rotates the rear face of the cube clockwise
-window.RearCW = function() {
+window.rearCW = function() {
 
 	
 
 }
 
 //Rotates the rear face of the cube counterclockwise
-window.RearCCW = function() {
+window.rearCCW = function() {
 
 	
 
 }
 
-//Takes in a 2D coordinate and rotates it the desired angle (in radians). Returns the new coordinate in an array
-function RotateCoordinate2D(xCoordinate, yCoordinate, rotationAngle) {
+//Takes in a 2D coordinate and rotates it the desired angle (in radians). Note the convention that adding to the angle moves CCW, subtracting moves CW.
+//Returns the new coordinate in an array
+function rotateCoordinate2D(xCoordinate, yCoordinate, rotationAngle) {
 
+	//Finds the magnitude of the vector between the origin and the coordinate. This will be conserved in a cube since it only allows for rotations in multiples of 90 degrees
 	var magnitude = Math.sqrt((xCoordinate * xCoordinate) + (yCoordinate * yCoordinate));
-	var angle = Math.atan(cubeArray[0][0][0].position.z, cubeArray[0][0][0].position.y);
-	var angle += rotationAngle;
+	
+	//Stores the angle of a vector from the origin to the coordinate. Note the atan2's parameters are (y, x) NOT (x, y). And it returns values from -pi to pi
+	var angle = Math.atan2(yCoordinate, xCoordinate);
+	
+	//Adds the desired rotation angle
+	angle += rotationAngle;
+
+	//Returns the new rotated coordinates
+	return [(Math.cos(angle) * magnitude), (Math.sin(angle) * magnitude)];
 	
 }
 
@@ -283,10 +283,48 @@ window.testJS = function() {
 	document.getElementById("test").innerHTML = "changed";
 	
 }
+
+//Moves the camera to an isometric view
+window.isometricCamera = function() {
+
+	camera.position.x = setCameraFromCubeSize();
+	camera.position.y = setCameraFromCubeSize();
+	camera.position.z = setCameraFromCubeSize();
+	camera.lookAt(0, 0, 0);
+	
+}
+
+//Moves the camera to the front view
+window.frontCamera = function() {
+
+	camera.position.x = 0;
+	camera.position.y = 0;
+	camera.position.z = setCameraFromCubeSize();
+	camera.lookAt(0, 0, 0);
+
+}
  
 
 /*********** NOTES
 
+Cube Positions from Cube size
+	For rotational and coordinate tracking purposes, it is easier if the centers of the faces of the cube line up with an axis.
+	We also want to keep the cube size standard at 1 x 1 x 1. The camera can move in and out to adjust the FOV.
+	Therefore, the positions of the cubes is defined:
+		Dead center of the cube is at (0, 0, 0)
+		Sides extend out cubeSize / 2 from this center
+		Centers of the outside cubes are 0.5 in from these sides
+		So in one axis, the cube positons are:
+			{((-cubeSize / 2) + 0.5), ((-cubeSize / 2) + 1.5), ...}
+		Matching this to a loop from i = 0 to i < cubeSize:
+			position(i) = i - ((cubeSize - 1) / 2)
+		Examples:
+			cubeSize	positions
+			3			-1, 0, 1
+			4			-3/2, -1/2, 1/2, 3/2
+			5			-2, -1, 0, 1, 2
+			
+			
 Rotation positions:
 	Define:
 		Faces: front, left, right, etc. at 0,0,0 rotation
