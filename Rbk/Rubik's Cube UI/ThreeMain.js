@@ -11,6 +11,7 @@ const whiteColor = 0xffffff;
 const redColor = 0xb71234;
 const orangeColor = 0xff5800;
 const yellowColor = 0xffd500;
+const borderColor = 0x000000;
 
 //Global variables for the scene, camera, and renderer
 var scene;
@@ -66,18 +67,55 @@ function setupCubeArray() {
 //Sets up the colors and creates the cube
 function createCube() {
 	
+	//Solid faces
 	var cubeMaterials = [
-		new THREE.MeshBasicMaterial({color:greenColor}),
-		new THREE.MeshBasicMaterial({color:blueColor}),
-		new THREE.MeshBasicMaterial({color:redColor}),
-		new THREE.MeshBasicMaterial({color:orangeColor}),
-		new THREE.MeshBasicMaterial({color:whiteColor}),
-		new THREE.MeshBasicMaterial({color:yellowColor})
+		new THREE.MeshBasicMaterial({
+			color:greenColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:blueColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:redColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:orangeColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:whiteColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:yellowColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		})
 	];
 
 	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
 	var cube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+	
+	//Cube borders
+	var borderGeometry = new THREE.EdgesGeometry(cube.geometry); // or WireframeGeometry
+	var borderMaterial = new THREE.LineBasicMaterial({color: borderColor});
+	var wireframe = new THREE.LineSegments(borderGeometry, borderMaterial);
+	cube.add(wireframe);
 
 	return cube;
 	
