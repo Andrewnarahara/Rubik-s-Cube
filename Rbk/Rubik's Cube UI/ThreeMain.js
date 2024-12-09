@@ -618,6 +618,14 @@ window.frontCamera = function() {
 
 /*********** NOTES
 
+To dos:
+Cube scrambler: maybe https://js.cubing.net/cubing/scramble/		https://www.npmjs.com/package/cubing		https://github.com/cubing/cubing.js
+Cube solver
+Animate cube motions
+Navigate around different cube views (in both isometric mode and square mode)
+	Label sides so user knows what they are looking at
+
+
 Cube Positions from Cube size
 	For rotational and coordinate tracking purposes, it is easier if the centers of the faces of the cube line up with an axis.
 	We also want to keep the cube size standard at 1 x 1 x 1. The camera can move in and out to adjust the FOV.
