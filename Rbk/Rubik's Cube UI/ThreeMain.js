@@ -222,7 +222,7 @@ window.rightCW = function() {
 					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, -Math.PI/2);
 					
 					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
-					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, -Math.PI/2);
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, Math.PI/2);
 					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
 					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
 					
@@ -253,7 +253,7 @@ window.rightCCW = function() {
 					cubeArray[i][j][k].rotateOnWorldAxis(xAxis, Math.PI/2);
 					
 					//Translate the cube. The cube will remain in the same YZ plane, so its X position will remain the same
-					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, Math.PI/2);
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.y, -Math.PI/2);
 					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
 					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
 					
@@ -332,42 +332,186 @@ window.topCCW = function() {
 //Rotates the bottom face of the cube clockwise
 window.bottomCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the bottom face (with the lowest Y coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.y == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the Y axis
+					const yAxis = new THREE.Vector3(0, 1, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(yAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XZ plane, so its Y position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.x, Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}	
 
 }
 
 //Rotates the bottom face of the cube counterclockwise
 window.bottomCCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the bottom face (with the lowest Y coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.y == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CCW along the Y axis
+					const yAxis = new THREE.Vector3(0, 1, 0);
+					cubeArray[i][j][k].rotateOnWorldAxis(yAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XZ plane, so its Y position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.z, cubeArray[i][j][k].position.x, -Math.PI/2);
+					cubeArray[i][j][k].position.z = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}	
 
 }
 
 //Rotates the front face of the cube clockwise
 window.frontCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the front face (with the highest Z coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.z == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the Z axis
+					const zAxis = new THREE.Vector3(0, 0, 1);
+					cubeArray[i][j][k].rotateOnWorldAxis(zAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XY plane, so its Z position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.x, cubeArray[i][j][k].position.y, -Math.PI/2);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the front face of the cube counterclockwise
 window.frontCCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the front face (with the highest Z coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.z == (cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CCW along the Z axis
+					const zAxis = new THREE.Vector3(0, 0, 1);
+					cubeArray[i][j][k].rotateOnWorldAxis(zAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XY plane, so its Z position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.x, cubeArray[i][j][k].position.y, Math.PI/2);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the rear face of the cube clockwise
 window.rearCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the rear face (with the lowest Z coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.z == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CW along the Z axis
+					const zAxis = new THREE.Vector3(0, 0, 1);
+					cubeArray[i][j][k].rotateOnWorldAxis(zAxis, Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XY plane, so its Z position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.x, cubeArray[i][j][k].position.y, Math.PI/2);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
 //Rotates the rear face of the cube counterclockwise
 window.rearCCW = function() {
 
-	
+	//Loops through all cubes, moves cubes in the rear face (with the lowest Z coordinate)
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				if (cubeArray[i][j][k].position.z == -(cubeSize - 1) / 2) {
+					
+					//Rotate the cube 90 degrees CCW along the Z axis
+					const zAxis = new THREE.Vector3(0, 0, 1);
+					cubeArray[i][j][k].rotateOnWorldAxis(zAxis, -Math.PI/2);
+					
+					//Translate the cube. The cube will remain in the same XY plane, so its Z position will remain the same
+					var newCoords = rotateCoordinate2D(cubeArray[i][j][k].position.x, cubeArray[i][j][k].position.y, -Math.PI/2);
+					cubeArray[i][j][k].position.x = smoothCoordinate(newCoords[0]);
+					cubeArray[i][j][k].position.y = smoothCoordinate(newCoords[1]);
+					
+				}
+				
+			}
+			
+		}
+		
+	}
 
 }
 
@@ -402,7 +546,7 @@ function smoothCoordinate(coordinateToSmooth) {
 //Solves the cube
 window.solveCube = function() {
 		
-	cube.rotation.z += Math.PI / 8;
+	alert("This function is not ready yet");
 	
 }
 
