@@ -183,6 +183,46 @@ function renderScene() {
 	
 }
 
+//Used to key turn algorithm notation to functions
+const turnActions = {
+	"L": () => leftCW(),
+	"L'": () => leftCCW(),
+	"L2": function() {
+		leftCW();
+		leftCW();
+	},
+	"R": () => rightCW(),
+	"R'": () => rightCCW(),
+	"R2": function() {
+		rightCW();
+		rightCW();
+	},
+	"U": () => upCW(),
+	"U'": () => upCW(),
+	"U2": function() {
+		upCW();
+		upCW();
+	},
+	"D": () => downCW(),
+	"D'": () => downCCW(),
+	"D2": function() {
+		downCW();
+		downCW();
+	},
+	"F": () => frontCW(),
+	"F'": () => frontCCW(),
+	"F2": function() {
+		frontCW();
+		frontCW();
+	},
+	"B": () => backCW(),
+	"B'": () => backCCW(),
+	"B2": function() {
+		backCW();
+		backCW();
+	}
+};
+
 //Rotates the left face of the cube clockwise
 window.leftCW = function() {
 
@@ -308,7 +348,7 @@ window.rightCCW = function() {
 }
 
 //Rotates the top face of the cube clockwise
-window.topCW = function() {
+window.upCW = function() {
 
 	//Loops through all cubes, moves cubes in the top face (with the highest Y coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -339,7 +379,7 @@ window.topCW = function() {
 }
 
 //Rotates the top face of the cube counterclockwise
-window.topCCW = function() {
+window.upCW = function() {
 
 	//Loops through all cubes, moves cubes in the top face (with the highest Y coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -370,7 +410,7 @@ window.topCCW = function() {
 }
 
 //Rotates the bottom face of the cube clockwise
-window.bottomCW = function() {
+window.downCW = function() {
 
 	//Loops through all cubes, moves cubes in the bottom face (with the lowest Y coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -401,7 +441,7 @@ window.bottomCW = function() {
 }
 
 //Rotates the bottom face of the cube counterclockwise
-window.bottomCCW = function() {
+window.downCCW = function() {
 
 	//Loops through all cubes, moves cubes in the bottom face (with the lowest Y coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -494,7 +534,7 @@ window.frontCCW = function() {
 }
 
 //Rotates the rear face of the cube clockwise
-window.rearCW = function() {
+window.backCW = function() {
 
 	//Loops through all cubes, moves cubes in the rear face (with the lowest Z coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -525,7 +565,7 @@ window.rearCW = function() {
 }
 
 //Rotates the rear face of the cube counterclockwise
-window.rearCCW = function() {
+window.backCCW = function() {
 
 	//Loops through all cubes, moves cubes in the rear face (with the lowest Z coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -586,8 +626,22 @@ function smoothCoordinate(coordinateToSmooth) {
 //Scrambles the cube
 window.scrambleCube = async function() {
 	
+	//Generate a scramble algorithm
 	var scramble = await randomScrambleForEvent("333");
 	document.getElementById("test").innerHTML = scramble;
+	
+	//Scrambling functions for other puzzle types - see notes here: https://js.cubing.net/cubing/scramble/
+	// (await randomScrambleForEvent("333")).log();
+	// (await randomScrambleForEvent("333bf")).log();
+	// (await randomScrambleForEvent("333fm")).log();
+	// (await randomScrambleForEvent("222")).log();
+	// (await randomScrambleForEvent("444")).log();
+	// (await randomScrambleForEvent("777")).log();
+	// (await randomScrambleForEvent("sq1")).log();
+	// (await randomScrambleForEvent("minx")).log();
+	// (await randomScrambleForEvent("clock")).log();
+	// (await randomScrambleForEvent("fto")).log();
+	// (await randomScrambleForEvent("master_tetraminx")).log();
 	
 }
 
@@ -629,8 +683,8 @@ window.frontCamera = function() {
 /*********** NOTES
 
 To dos:
-Cube scrambler: maybe https://js.cubing.net/cubing/scramble/		https://www.npmjs.com/package/cubing		https://github.com/cubing/cubing.js
-Cube solver
+Keying functions to algorithm commands?
+Cube solving functions
 Animate cube motions
 Navigate around different cube views (in both isometric mode and square mode)
 	Label sides so user knows what they are looking at
@@ -652,7 +706,12 @@ Cube Positions from Cube size
 			3			-1, 0, 1
 			4			-3/2, -1/2, 1/2, 3/2
 			5			-2, -1, 0, 1, 2
-			
+
+Algorithm Notation:
+	Up (U), Down (D), Right (R), Left (L), Front (F), and Back (B) are the basic turn axes.
+	No prime (U, D, R, L, F, B) indicates a single 90 degree turn clockwise when facing the face.
+	A prime (U', D', R', L', F', B') indicates a single 90 degree turn counterclockwise when facing the face.
+	A 2 (U2, D2, R2, L2, F2, B2) indicates a single 180 degree turn of the face.
 			
 Rotation positions:
 	Define:
