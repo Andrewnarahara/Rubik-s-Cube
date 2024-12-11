@@ -1,13 +1,5 @@
 import * as THREE from 'three';
-
-
-
-
 import { randomScrambleForEvent } from "/lib/cubing.js/src/cubing/scramble";
-
-//const scramble = randomScrambleForEvent("333");
-//alert(scramble);
-//console.log(scramble.toString());
 
 
 //The proportion of the window width and height the canvas will take up
@@ -588,6 +580,14 @@ function rotateCoordinate2D(xCoordinate, yCoordinate, rotationAngle) {
 function smoothCoordinate(coordinateToSmooth) {
 	
 	return Math.round(coordinateToSmooth * 2) / 2;
+	
+}
+
+//Scrambles the cube
+window.scrambleCube = async function() {
+	
+	var scramble = await randomScrambleForEvent("333");
+	document.getElementById("test").innerHTML = scramble;
 	
 }
 
