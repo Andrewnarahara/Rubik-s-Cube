@@ -1,0 +1,3 @@
+[submodule "Rbk/Rubik's Cube UI/lib/cubing.js"]
+	path = Rbk/Rubik's Cube UI/lib/cubing.js
+	url = https://github.com/cubing/cubing.js

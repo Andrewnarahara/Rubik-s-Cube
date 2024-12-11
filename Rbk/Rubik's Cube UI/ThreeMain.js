@@ -1,5 +1,15 @@
 import * as THREE from 'three';
 
+
+
+
+import { randomScrambleForEvent } from "/lib/cubing.js/src/cubing/scramble";
+
+//const scramble = randomScrambleForEvent("333");
+//alert(scramble);
+//console.log(scramble.toString());
+
+
 //The proportion of the window width and height the canvas will take up
 const windowWidthPercentageForCanvas = 0.6;
 const windowHeightPercentageForCanvas = 0.6;
