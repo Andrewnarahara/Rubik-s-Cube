@@ -630,6 +630,10 @@ window.scrambleCube = async function() {
 	var scramble = await randomScrambleForEvent("333");
 	document.getElementById("test").innerHTML = scramble;
 	
+	//Parses the scramble algorithm and gets an array of individual steps
+	var scrambleSteps = parseAlgorithm(scramble);
+	
+	
 	//Scrambling functions for other puzzle types - see notes here: https://js.cubing.net/cubing/scramble/
 	// (await randomScrambleForEvent("333")).log();
 	// (await randomScrambleForEvent("333bf")).log();
@@ -642,6 +646,14 @@ window.scrambleCube = async function() {
 	// (await randomScrambleForEvent("clock")).log();
 	// (await randomScrambleForEvent("fto")).log();
 	// (await randomScrambleForEvent("master_tetraminx")).log();
+	
+}
+
+//Takes in a list of algorithm steps in a single string and parses this into an array of individual steps
+//Returns the array of individual steps
+function parseAlgorithm(algorithmStepsString) {
+	
+	
 	
 }
 
@@ -683,7 +695,7 @@ window.frontCamera = function() {
 /*********** NOTES
 
 To dos:
-Keying functions to algorithm commands?
+Do cube scrambling
 Cube solving functions
 Animate cube motions
 Navigate around different cube views (in both isometric mode and square mode)
