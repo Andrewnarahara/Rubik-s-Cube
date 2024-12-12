@@ -1,3 +1,6 @@
 [submodule "Rbk/Rubik's Cube UI/lib/cubing.js"]
 	path = Rbk/Rubik's Cube UI/lib/cubing.js
 	url = https://github.com/cubing/cubing.js
+[submodule "Rbk/Rubik's Cube UI/lib/threex.dynamictexture"]
+	path = Rbk/Rubik's Cube UI/lib/threex.dynamictexture
+	url = https://github.com/jeromeetienne/threex.dynamictexture

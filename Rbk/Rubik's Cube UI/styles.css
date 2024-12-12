@@ -50,10 +50,23 @@ canvas {
 	
 }
 
-#navigationCanvasContainer {
-
+#navTable {
+	
 	width: 20%;
 	float: left;
 	background-color: green;
+	
+}
+
+#navTable button {
+	
+	margin: auto;
+	display: block;
+	
+}
+
+#navigationCanvasContainer {
+
+	width: 100%;
 	
 }

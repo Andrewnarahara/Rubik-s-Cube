@@ -2,9 +2,11 @@ import * as THREE from 'three';
 import { randomScrambleForEvent } from "/lib/cubing.js/src/cubing/scramble";
 
 
-//The proportion of the window width and height the canvas will take up
-const windowWidthPercentageForCanvas = 0.6;
-const windowHeightPercentageForCanvas = 0.6;
+//The proportion of the window width and height the canvases will take up
+const windowWidthPercentageForCubeCanvas = 0.6;
+const windowHeightPercentageForCubeCanvas = 0.6;
+const windowWidthPercentageForNavigationCanvas = 0.2;			//Currently unused
+const windowHeightPercentageForNavigationCanvas = 0.2;			//Currently unused
 
 //Constants for colors
 const greenColor = 0x009b48;
@@ -15,10 +17,18 @@ const orangeColor = 0xff5800;
 const yellowColor = 0xffd500;
 const borderColor = 0x000000;
 
-//Global variables for the scene, camera, and renderer
-var scene;
-var camera;
-var renderer;
+//Stores the face textures for each face of the nav cube to allow for text to be put on it
+var navFaceTextures;
+
+//Global variables for the cube scene, camera, and renderer
+var cubeScene;
+var cubeCamera;
+var cubeRenderer;
+
+//Global variables for the navigation scene, camera, and renderer
+var navScene;
+var navCamera;
+var navRenderer;
 
 //Stores the current x, y, and z rotation positions.
 //We start with the X axis to the right, Y axis up, and Z axis coming out of the page.
@@ -27,9 +37,9 @@ var renderer;
 	//Y
 	//Z always rotates around the same axis relative to a face as it moves around. So, if the white face is facing forwards at the start, it will always rotate around an axis perpendicular to this white face no matter how that face is moved. Default is CCW when facing it from the front
 //Then we rotate X 45 degrees (CCW from the right is positive) and Y 45 degrees (CCW from the top is positive) to get an isometric view
-var xRotationPos = Math.PI / 4;
-var yRotationPos = Math.PI / 4;
-var zRotationPos = 0;
+var xRotationPos = Math.PI / 4;				//Currently unused
+var yRotationPos = Math.PI / 4;				//Currently unused
+var zRotationPos = 0;						//Currently unused
 
 //Cube size (3 = 3x3, 4 = 4x4, etc.)
 const cubeSize = 3;
@@ -130,6 +140,7 @@ function createCube() {
 	
 }
 
+
 //Sets up the navigation cube
 function setupNavigationCube() {
 	
@@ -175,7 +186,7 @@ function setupNavigationCube() {
 
 	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 
-	var navCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+	navCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
 	
 	//Cube borders
 	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
@@ -185,28 +196,55 @@ function setupNavigationCube() {
 	
 }
 
+//Fills the navFaceTextures array with the textures necessary to display each face name on the navCube
+function createNavCubeTextures() {
+	
+	
+	
+	  var i;
+  for(i = 0; i < 6; i++) {
+    var dynamictexture = new THREEx.DynamicTexture(512, 512);
+    dynamictexture.context.font = "bolder 90px verdana";
+    dynamictexture.texture.needsUpdate = true;
+    dynamictexture.clear('#d35400').drawText(i.toString(), undefined, 256, 'green');
+    face_textures.push(dynamictexture);
+  }
+  
+  
+  var materials = [
+  new THREE.MeshBasicMaterial({map: face_textures[0].texture}),
+  new THREE.MeshBasicMaterial({map: face_textures[1].texture}),
+  new THREE.MeshBasicMaterial({map: face_textures[2].texture}),
+  new THREE.MeshBasicMaterial({map: face_textures[3].texture}),
+  new THREE.MeshBasicMaterial({map: face_textures[4].texture}),
+  new THREE.MeshBasicMaterial({map: face_textures[5].texture})
+];
+
+	
+}
+
 //Sets up the camera, renderer, and canvas for the cube
 function startCubeScene() {
 
-	//Define the canvas size and aspect ration based on a proportion of the window size
-	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
-	var canvasHeight = window.innerHeight * windowHeightPercentageForCanvas;
+	//Define the canvas size and aspect ratio based on a proportion of the window size
+	var canvasWidth = window.innerWidth * windowWidthPercentageForCubeCanvas;
+	var canvasHeight = window.innerHeight * windowHeightPercentageForCubeCanvas;
 	var aspect = canvasWidth / canvasHeight;
 	
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
-	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	camera.position.z = setCameraFromCubeSize();
-	camera.lookAt(0, 0, 0);
+	cubeCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeCamera.lookAt(0, 0, 0);
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
-	renderer = new THREE.WebGLRenderer();
-	renderer.setClearColor(0xCFCFCF, 1);
-	renderer.setSize(canvasWidth, canvasHeight);
-	renderer.setAnimationLoop(animateScene);
-	document.getElementById("cubeCanvasContainer").appendChild(renderer.domElement);
+	cubeRenderer = new THREE.WebGLRenderer();
+	cubeRenderer.setClearColor(0xCFCFCF, 1);
+	cubeRenderer.setSize(canvasWidth, canvasHeight);
+	cubeRenderer.setAnimationLoop(animateCubeScene);
+	document.getElementById("cubeCanvasContainer").appendChild(cubeRenderer.domElement);
 		
 	//Create the scene
-	scene = new THREE.Scene();
+	cubeScene = new THREE.Scene();
 	
 	//Loop through all cubes, add them to the scene, and set their position
 	for (var i = 0; i < cubeSize; i++) {
@@ -215,7 +253,7 @@ function startCubeScene() {
 						
 			for (var k = 0; k < cubeSize; k++) {
 				
-				scene.add(cubeArray[i][j][k]);
+				cubeScene.add(cubeArray[i][j][k]);
 				cubeArray[i][j][k].position.set(i - ((cubeSize - 1) / 2), j - ((cubeSize - 1) / 2), k - ((cubeSize - 1) / 2));
 				
 			}
@@ -226,46 +264,33 @@ function startCubeScene() {
 	
 }
 
-
 //Sets up the camera, renderer, and canvas for the navigation
 function startNavScene() {
-/*
-	//Define the canvas size and aspect ration based on a proportion of the window size
-	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
-	var canvasHeight = window.innerHeight * windowHeightPercentageForCanvas;
+
+	//Define the canvas size and aspect ratio based on a proportion of the window size
+	var canvasWidth = document.getElementById("navigationCanvasContainer").parentElement.getBoundingClientRect().width;
+	var canvasHeight = canvasWidth;
 	var aspect = canvasWidth / canvasHeight;
 	
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
-	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	camera.position.z = setCameraFromCubeSize();
-	camera.lookAt(0, 0, 0);
+	navCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+	navCamera.position.z = 2.5;
+	navCamera.lookAt(0, 0, 0);
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
-	renderer = new THREE.WebGLRenderer();
-	renderer.setClearColor(0xCFCFCF, 1);
-	renderer.setSize(canvasWidth, canvasHeight);
-	renderer.setAnimationLoop(animateScene);
-	document.getElementById("navigationCanvasContainer").appendChild(renderer.domElement);
+	navRenderer = new THREE.WebGLRenderer();
+	navRenderer.setClearColor(0xCFCFCF, 1);
+	navRenderer.setSize(canvasWidth, canvasHeight);
+	navRenderer.setAnimationLoop(animateNavScene);
+	document.getElementById("navigationCanvasContainer").appendChild(navRenderer.domElement);
 		
 	//Create the scene
-	scene = new THREE.Scene();
+	navScene = new THREE.Scene();
 	
-	//Loop through all cubes, add them to the scene, and set their position
-	for (var i = 0; i < cubeSize; i++) {
-				
-		for (var j = 0; j < cubeSize; j++) {
-						
-			for (var k = 0; k < cubeSize; k++) {
-				
-				scene.add(cubeArray[i][j][k]);
-				cubeArray[i][j][k].position.set(i - ((cubeSize - 1) / 2), j - ((cubeSize - 1) / 2), k - ((cubeSize - 1) / 2));
-				
-			}
-			
-		}
-		
-	}
-	*/
+	//Add the navigation cube to the scene and set its position
+	navScene.add(navCube);
+	navCube.position.set(0, 0, 0);
+	
 }
 
 //Sets the camera Z position based on the cube size
@@ -275,15 +300,27 @@ function setCameraFromCubeSize() {
 	
 }
 
-function animateScene() {
+function animateCubeScene() {
 
-	renderScene();
+	renderCubeScene();
 	
 }
 
-function renderScene() {
+function renderCubeScene() {
 	
-	renderer.render(scene, camera);
+	cubeRenderer.render(cubeScene, cubeCamera);
+	
+}
+
+function animateNavScene() {
+
+	renderNavScene();
+	
+}
+
+function renderNavScene() {
+	
+	navRenderer.render(navScene, navCamera);
 	
 }
 
@@ -778,26 +815,30 @@ window.solveCube = function() {
 window.testJS = function() {
 
 	document.getElementById("test").innerHTML = "changed";
+	navCamera.position.x = 1.5;
+	navCamera.position.y = 1.5;
+	navCamera.position.z = 1.5;
+	navCamera.lookAt(0, 0, 0);
 	
 }
 
 //Moves the camera to an isometric view
 window.isometricCamera = function() {
 
-	camera.position.x = setCameraFromCubeSize();
-	camera.position.y = setCameraFromCubeSize();
-	camera.position.z = setCameraFromCubeSize();
-	camera.lookAt(0, 0, 0);
+	cubeCamera.position.x = setCameraFromCubeSize();
+	cubeCamera.position.y = setCameraFromCubeSize();
+	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeCamera.lookAt(0, 0, 0);
 	
 }
 
 //Moves the camera to the front view
 window.frontCamera = function() {
 
-	camera.position.x = 0;
-	camera.position.y = 0;
-	camera.position.z = setCameraFromCubeSize();
-	camera.lookAt(0, 0, 0);
+	cubeCamera.position.x = 0;
+	cubeCamera.position.y = 0;
+	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeCamera.lookAt(0, 0, 0);
 
 }
  
