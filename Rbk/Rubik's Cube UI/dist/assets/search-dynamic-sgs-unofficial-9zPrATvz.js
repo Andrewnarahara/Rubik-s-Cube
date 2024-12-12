@@ -1,4 +1,4 @@
-import{p as H,A as N,r as y}from"./index-C3JNUt0X.js";import{p as E}from"./parseSGS-DDXLQi0V.js";import"./search-worker-entry-CVNgimpE.js";let J=null;async function _B(){return J??=K()}async function K(){return E(await H.fto.kpuzzle(),`SubgroupSizes 24 12 11 12 12 11 10 9 11 8 10 9 7 8 10 10 6 9 8 5 7 6 5 4 4 8 7 3 6 6 360
+import{p as H,A as N,r as y}from"./index-DmgjFuaj.js";import{p as E}from"./parseSGS-B7SznWJR.js";import"./search-worker-entry-CiiqNvj2.js";let J=null;async function _B(){return J??(J=K())}async function K(){return E(await H.fto.kpuzzle(),`SubgroupSizes 24 12 11 12 12 11 10 9 11 8 10 9 7 8 10 10 6 9 8 5 7 6 5 4 4 8 7 3 6 6 360
 
 Alg T
 Alg B

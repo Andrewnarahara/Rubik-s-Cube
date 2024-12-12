@@ -379,7 +379,7 @@ window.upCW = function() {
 }
 
 //Rotates the top face of the cube counterclockwise
-window.upCW = function() {
+window.upCCW = function() {
 
 	//Loops through all cubes, moves cubes in the top face (with the highest Y coordinate)
 	for (var i = 0; i < cubeSize; i++) {
@@ -628,11 +628,18 @@ window.scrambleCube = async function() {
 	
 	//Generate a scramble algorithm
 	var scramble = await randomScrambleForEvent("333");
-	document.getElementById("test").innerHTML = scramble;
 	
 	//Parses the scramble algorithm and gets an array of individual steps
-	var scrambleSteps = parseAlgorithm(scramble);
+	var scrambleSteps = parseAlgorithm(scramble.toString());
 	
+	//Performs the scramble function for the specified scramble algorithm
+	for (var stepIndex = 0; stepIndex < scrambleSteps.length; stepIndex++) {
+		
+		turnActions[scrambleSteps[stepIndex]]();
+		
+	}
+	
+	alert(scramble);
 	
 	//Scrambling functions for other puzzle types - see notes here: https://js.cubing.net/cubing/scramble/
 	// (await randomScrambleForEvent("333")).log();
@@ -653,7 +660,8 @@ window.scrambleCube = async function() {
 //Returns the array of individual steps
 function parseAlgorithm(algorithmStepsString) {
 	
-	
+	//Each step should be separated by a space, so we can use split to turn this into an array
+	return algorithmStepsString.split(" ");
 	
 }
 
@@ -695,12 +703,13 @@ window.frontCamera = function() {
 /*********** NOTES
 
 To dos:
-Do cube scrambling
 Cube solving functions
 Animate cube motions
 Navigate around different cube views (in both isometric mode and square mode)
 	Label sides so user knows what they are looking at
 
+Testing cube algorithms
+	This site allows you to enter an algorithm and see what happens to a cube: https://codepen.io/cubing/pen/gOLMYqK
 
 Cube Positions from Cube size
 	For rotational and coordinate tracking purposes, it is easier if the centers of the faces of the cube line up with an axis.
