@@ -43,9 +43,17 @@ canvas {
 	
 }
 
-#canvasContainer {
+#cubeCanvasContainer {
 
 	width: 60%;
 	float: left;
+	
+}
+
+#navigationCanvasContainer {
+
+	width: 20%;
+	float: left;
+	background-color: green;
 	
 }

@@ -37,9 +37,16 @@ const cubeSize = 3;
 //Array to hold the cube objects comprising the entire cube
 var cubeArray = [];
 
-//Functions to set up the canvas and cube elements within it
+//The navigation cube object
+var navCube;
+
+//Functions to set up the cube canvas and cube elements within it
 setupCubeArray();
-startScene();
+startCubeScene();
+
+//Functions to set up the navigation canvas and cube element within it
+setupNavigationCube();
+startNavScene();
 
 //Creates the array of cubes that define the Rubik's Cube
 function setupCubeArray() {
@@ -123,8 +130,63 @@ function createCube() {
 	
 }
 
-//Sets up the camera, renderer, and canvas
-function startScene() {
+//Sets up the navigation cube
+function setupNavigationCube() {
+	
+	//Solid faces
+	var cubeMaterials = [
+		new THREE.MeshBasicMaterial({
+			color:greenColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:blueColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:redColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:orangeColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:whiteColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		}),
+		new THREE.MeshBasicMaterial({
+			color:yellowColor,
+			polygonOffset: true,
+			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
+			polygonOffsetUnits: 1
+		})
+	];
+
+	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+
+	var navCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+	
+	//Cube borders
+	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
+	var borderMaterial = new THREE.LineBasicMaterial({color: borderColor});
+	var wireframe = new THREE.LineSegments(borderGeometry, borderMaterial);
+	navCube.add(wireframe);
+	
+}
+
+//Sets up the camera, renderer, and canvas for the cube
+function startCubeScene() {
 
 	//Define the canvas size and aspect ration based on a proportion of the window size
 	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
@@ -141,7 +203,7 @@ function startScene() {
 	renderer.setClearColor(0xCFCFCF, 1);
 	renderer.setSize(canvasWidth, canvasHeight);
 	renderer.setAnimationLoop(animateScene);
-	document.getElementById("canvasContainer").appendChild(renderer.domElement);
+	document.getElementById("cubeCanvasContainer").appendChild(renderer.domElement);
 		
 	//Create the scene
 	scene = new THREE.Scene();
@@ -162,6 +224,48 @@ function startScene() {
 		
 	}
 	
+}
+
+
+//Sets up the camera, renderer, and canvas for the navigation
+function startNavScene() {
+/*
+	//Define the canvas size and aspect ration based on a proportion of the window size
+	var canvasWidth = window.innerWidth * windowWidthPercentageForCanvas;
+	var canvasHeight = window.innerHeight * windowHeightPercentageForCanvas;
+	var aspect = canvasWidth / canvasHeight;
+	
+	//Create the camera and move it away from the origin so it is outside of the cube bounds
+	camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+	camera.position.z = setCameraFromCubeSize();
+	camera.lookAt(0, 0, 0);
+
+	//Create the renderer, define the animate function, and create the canvas in the HTML file
+	renderer = new THREE.WebGLRenderer();
+	renderer.setClearColor(0xCFCFCF, 1);
+	renderer.setSize(canvasWidth, canvasHeight);
+	renderer.setAnimationLoop(animateScene);
+	document.getElementById("navigationCanvasContainer").appendChild(renderer.domElement);
+		
+	//Create the scene
+	scene = new THREE.Scene();
+	
+	//Loop through all cubes, add them to the scene, and set their position
+	for (var i = 0; i < cubeSize; i++) {
+				
+		for (var j = 0; j < cubeSize; j++) {
+						
+			for (var k = 0; k < cubeSize; k++) {
+				
+				scene.add(cubeArray[i][j][k]);
+				cubeArray[i][j][k].position.set(i - ((cubeSize - 1) / 2), j - ((cubeSize - 1) / 2), k - ((cubeSize - 1) / 2));
+				
+			}
+			
+		}
+		
+	}
+	*/
 }
 
 //Sets the camera Z position based on the cube size
@@ -639,8 +743,6 @@ window.scrambleCube = async function() {
 		
 	}
 	
-	alert(scramble);
-	
 	//Scrambling functions for other puzzle types - see notes here: https://js.cubing.net/cubing/scramble/
 	// (await randomScrambleForEvent("333")).log();
 	// (await randomScrambleForEvent("333bf")).log();
@@ -703,10 +805,15 @@ window.frontCamera = function() {
 /*********** NOTES
 
 To dos:
-Cube solving functions
-Animate cube motions
 Navigate around different cube views (in both isometric mode and square mode)
 	Label sides so user knows what they are looking at
+	Based on OnShape's navigation UI?
+		Up, Down, Left, Right, Rotate CW, Rotate CCW in steps
+Cube solving functions
+	-My own
+	-Optimized solve
+Animate cube motions
+
 
 Testing cube algorithms
 	This site allows you to enter an algorithm and see what happens to a cube: https://codepen.io/cubing/pen/gOLMYqK
