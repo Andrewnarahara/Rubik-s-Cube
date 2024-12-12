@@ -1,7 +1,11 @@
 import * as THREE from 'three';
 import { randomScrambleForEvent } from "/lib/cubing.js/src/cubing/scramble";
+//import { THREEx.DynamicTexture } from "/lib/threex.dynamictexture/threex.dynamictexture.js";
+
+var THREEx = require("/lib/threex.dynamictexture/threex.dynamictexture.js"); 
 
 
+alert("loaded");
 //The proportion of the window width and height the canvases will take up
 const windowWidthPercentageForCubeCanvas = 0.6;
 const windowHeightPercentageForCubeCanvas = 0.6;
@@ -185,6 +189,8 @@ function setupNavigationCube() {
 	];
 
 	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+	
+	createNavCubeTextures();
 
 	navCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
 	
@@ -199,18 +205,17 @@ function setupNavigationCube() {
 //Fills the navFaceTextures array with the textures necessary to display each face name on the navCube
 function createNavCubeTextures() {
 	
-	
-	
-	  var i;
-  for(i = 0; i < 6; i++) {
-    var dynamictexture = new THREEx.DynamicTexture(512, 512);
-    dynamictexture.context.font = "bolder 90px verdana";
-    dynamictexture.texture.needsUpdate = true;
-    dynamictexture.clear('#d35400').drawText(i.toString(), undefined, 256, 'green');
-    face_textures.push(dynamictexture);
-  }
-  
-  
+	for(var i = 0; i < 6; i++) {
+		
+		//var dynamicTexture = new THREEx.DynamicTexture(512, 512);
+		//dynamicTexture.context.font = "bolder 90px verdana";
+		//dynamicTexture.texture.needsUpdate = true;
+		//dynamicTexture.clear('#d35400').drawText(i.toString(), undefined, 256, 'green');
+		//navFaceTextures.push(dynamicTexture);
+		
+	}
+  alert("test");
+  /*
   var materials = [
   new THREE.MeshBasicMaterial({map: face_textures[0].texture}),
   new THREE.MeshBasicMaterial({map: face_textures[1].texture}),
@@ -220,6 +225,25 @@ function createNavCubeTextures() {
   new THREE.MeshBasicMaterial({map: face_textures[5].texture})
 ];
 
+
+
+
+// Create a dynamic texture
+const dynamicTexture = new DynamicTexture(512, 512);
+dynamicTexture.context.font = 'bold 30px Arial';
+dynamicTexture.drawText('Dynamic Text', 20, 50, 'black');
+
+// Create a material and assign the texture
+const material = new THREE.MeshBasicMaterial({ map: dynamicTexture.texture });
+
+// Create a mesh and add it to the scene
+// ...
+
+// Update the dynamic texture
+dynamicTexture.clear();
+dynamicTexture.drawText('Updated Text!', 20, 50, 'red');
+
+*/
 	
 }
 
