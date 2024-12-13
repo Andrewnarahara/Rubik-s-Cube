@@ -54,6 +54,9 @@ var cubeArray = [];
 //The navigation cube object
 var navCube;
 
+//Stores the angle step size each turn of the cube will make when using the nav buttons
+const navCubeStepSize = Math.PI / 4;
+
 //Functions to set up the cube canvas and cube elements within it
 setupCubeArray();
 startCubeScene();
@@ -220,33 +223,12 @@ function createNavCubeTextures() {
 		
 		//Create a dynamic texture
 		var dynamicTexture = new DynamicTexture(512, 512);
-		dynamicTexture.context.font = "bolder 150px verdana";
+		dynamicTexture.context.font = "bold 130px arial";
 		dynamicTexture.texture.needsUpdate = true;
-		dynamicTexture.clear('#d35400').drawText(faceNames[i].toString(), undefined, 256, 'green');
+		dynamicTexture.clear('#F5F5F5').drawText(faceNames[i].toString(), undefined, 300, 'black');
 		navFaceTextures.push(dynamicTexture);
 		
 	}
-
-
-/*
-
-// Create a dynamic texture
-const dynamicTexture = new DynamicTexture(512, 512);
-dynamicTexture.context.font = 'bold 30px Arial';
-dynamicTexture.drawText('Dynamic Text', 20, 50, 'black');
-
-// Create a material and assign the texture
-const material = new THREE.MeshBasicMaterial({ map: dynamicTexture.texture });
-
-// Create a mesh and add it to the scene
-// ...
-
-// Update the dynamic texture
-dynamicTexture.clear();
-dynamicTexture.drawText('Updated Text!', 20, 50, 'red');
-
-*/
-		document.getElementById("test").innerHTML = "throughNavCubeTextures";
 
 }
 
@@ -791,6 +773,13 @@ function smoothCoordinate(coordinateToSmooth) {
 	
 }
 
+//Rotates the nav cube and the cube counterclockwise by one step
+window.rotateCCW = function() {
+	
+	
+	
+}
+
 //Scrambles the cube
 window.scrambleCube = async function() {
 	
@@ -874,7 +863,6 @@ window.frontCamera = function() {
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Label sides so user knows what they are looking at
 	Based on OnShape's navigation UI?
 		Up, Down, Left, Right, Rotate CW, Rotate CCW in steps
 	Also add drag to rotate on main cube?
