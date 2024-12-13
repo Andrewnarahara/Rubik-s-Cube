@@ -1,11 +1,7 @@
 import * as THREE from 'three';
 import { randomScrambleForEvent } from "/lib/cubing.js/src/cubing/scramble";
-//import { THREEx.DynamicTexture } from "/lib/threex.dynamictexture/threex.dynamictexture.js";
-
-var THREEx = require("/lib/threex.dynamictexture/threex.dynamictexture.js"); 
 
 
-alert("loaded");
 //The proportion of the window width and height the canvases will take up
 const windowWidthPercentageForCubeCanvas = 0.6;
 const windowHeightPercentageForCubeCanvas = 0.6;
@@ -22,7 +18,7 @@ const yellowColor = 0xffd500;
 const borderColor = 0x000000;
 
 //Stores the face textures for each face of the nav cube to allow for text to be put on it
-var navFaceTextures;
+var navFaceTextures = [];
 
 //Global variables for the cube scene, camera, and renderer
 var cubeScene;
@@ -53,6 +49,150 @@ var cubeArray = [];
 
 //The navigation cube object
 var navCube;
+
+
+//************************************************************//
+//var THREEx = new THREE;
+
+
+class DynamicTexture {
+	
+	constructor(width, height){
+		
+		var canvas	= document.createElement( 'canvas' );
+		canvas.width	= width;
+		canvas.height	= height;
+		this.canvas	= canvas;
+
+		var context	= canvas.getContext( '2d' );
+		this.context	= context;
+
+		var texture	= new THREE.Texture(canvas);
+		this.texture	= texture;
+	
+	}
+	
+}
+
+DynamicTexture.prototype.clear = function(fillStyle){
+	// depends on fillStyle
+	if( fillStyle !== undefined ){
+		this.context.fillStyle	= fillStyle
+		this.context.fillRect(0,0,this.canvas.width, this.canvas.height)
+	}else{
+		this.context.clearRect(0,0,this.canvas.width, this.canvas.height)
+	}
+	// make the texture as .needsUpdate
+	this.texture.needsUpdate	= true;
+	// for chained API
+	return this;
+}
+
+/**
+ * draw text
+ *
+ * @param  {String}		text	- the text to display
+ * @param  {Number|undefined}	x	- if provided, it is the x where to draw, if not, the text is centered
+ * @param  {Number}		y	- the y where to draw the text
+ * @param  {String*} 		fillStyle - the fillStyle to clear with, if not provided, fallback on .clearRect
+ * @param  {String*} 		contextFont - the font to use
+ * @return {THREEx.DynamicTexture}	- the object itself, for chained texture
+ */
+DynamicTexture.prototype.drawText = function(text, x, y, fillStyle, contextFont){
+	// set font if needed
+	if( contextFont !== undefined )	this.context.font = contextFont;
+	// if x isnt provided
+	if( x === undefined || x === null ){
+		var textSize	= this.context.measureText(text);
+		x = (this.canvas.width - textSize.width) / 2;
+	}
+	// actually draw the text
+	this.context.fillStyle = fillStyle;
+	this.context.fillText(text, x, y);
+	// make the texture as .needsUpdate
+	this.texture.needsUpdate	= true;
+	// for chained API
+	return this;
+};
+
+DynamicTexture.prototype.drawTextCooked = function(options){
+	var context	= this.context
+	var canvas	= this.canvas
+	options		= options	|| {}
+	var text	= options.text
+	var params	= {
+		margin		: options.margin !== undefined ? options.margin	: 0.1,
+		lineHeight	: options.lineHeight !== undefined ? options.lineHeight : 0.1,
+		align		: options.align !== undefined ? options.align : 'left',
+		fillStyle	: options.fillStyle !== undefined ? options.fillStyle : 'black',
+		font		: options.font !== undefined ? options.font : "bold "+(0.2*512)+"px Arial",
+	}
+	// sanity check
+	console.assert(typeof(text) === 'string')
+
+	context.save()
+	context.fillStyle	= params.fillStyle;
+	context.font		= params.font;
+
+	var y	= (params.lineHeight + params.margin)*canvas.height
+	while(text.length > 0 ){
+		// compute the text for specifically this line
+		var maxText	= computeMaxTextLength(text)
+		// update the remaining text
+		text	= text.substr(maxText.length)
+
+
+		// compute x based on params.align
+		var textSize	= context.measureText(maxText);
+		if( params.align === 'left' ){
+			var x	= params.margin*canvas.width
+		}else if( params.align === 'right' ){
+			var x	= (1-params.margin)*canvas.width - textSize.width
+		}else if( params.align === 'center' ){
+			var x = (canvas.width - textSize.width) / 2;
+		}else	console.assert( false )
+
+		// actually draw the text at the proper position
+		this.context.fillText(maxText, x, y);
+
+		// goto the next line
+		y	+= params.lineHeight*canvas.height
+	}
+	context.restore()
+
+	// make the texture as .needsUpdate
+	this.texture.needsUpdate	= true;
+	// for chained API
+	return this;
+
+	function computeMaxTextLength(text){
+		var maxText	= ''
+		var maxWidth	= (1-params.margin*2)*canvas.width
+		while( maxText.length !== text.length ){
+			var textSize	= context.measureText(maxText);
+			if( textSize.width > maxWidth )	break;
+			maxText	+= text.substr(maxText.length, 1)
+		}
+		return maxText
+	}
+}
+
+/**
+ * execute the drawImage on the internal context
+ * the arguments are the same the official context2d.drawImage
+ */
+DynamicTexture.prototype.drawImage	= function(/* same params as context2d.drawImage */){
+	// call the drawImage
+	this.context.drawImage.apply(this.context, arguments)
+	// make the texture as .needsUpdate
+	this.texture.needsUpdate	= true;
+	// for chained API
+	return this;
+}
+
+
+//************************************************************//
+
 
 //Functions to set up the cube canvas and cube elements within it
 setupCubeArray();
@@ -191,8 +331,19 @@ function setupNavigationCube() {
 	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 	
 	createNavCubeTextures();
+	
+	var materials = [
+	
+		new THREE.MeshBasicMaterial({map: navFaceTextures[0].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[1].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[2].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[3].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[4].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[5].texture})
+		
+	];
 
-	navCube = new THREE.Mesh(cubeGeometry, cubeMaterials);
+	navCube = new THREE.Mesh(cubeGeometry, materials);//cubeMaterials);
 	
 	//Cube borders
 	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
@@ -207,26 +358,18 @@ function createNavCubeTextures() {
 	
 	for(var i = 0; i < 6; i++) {
 		
-		//var dynamicTexture = new THREEx.DynamicTexture(512, 512);
-		//dynamicTexture.context.font = "bolder 90px verdana";
-		//dynamicTexture.texture.needsUpdate = true;
-		//dynamicTexture.clear('#d35400').drawText(i.toString(), undefined, 256, 'green');
-		//navFaceTextures.push(dynamicTexture);
+		// Create a dynamic texture
+		var dynamicTexture = new DynamicTexture(512, 512);
+		//new THREEx.DynamicTexture(512, 512);
+		dynamicTexture.context.font = "bolder 90px verdana";
+		dynamicTexture.texture.needsUpdate = true;
+		dynamicTexture.clear('#d35400').drawText(i.toString(), undefined, 256, 'green');
+		navFaceTextures.push(dynamicTexture);
 		
 	}
-  alert("test");
-  /*
-  var materials = [
-  new THREE.MeshBasicMaterial({map: face_textures[0].texture}),
-  new THREE.MeshBasicMaterial({map: face_textures[1].texture}),
-  new THREE.MeshBasicMaterial({map: face_textures[2].texture}),
-  new THREE.MeshBasicMaterial({map: face_textures[3].texture}),
-  new THREE.MeshBasicMaterial({map: face_textures[4].texture}),
-  new THREE.MeshBasicMaterial({map: face_textures[5].texture})
-];
 
 
-
+/*
 
 // Create a dynamic texture
 const dynamicTexture = new DynamicTexture(512, 512);
@@ -244,7 +387,8 @@ dynamicTexture.clear();
 dynamicTexture.drawText('Updated Text!', 20, 50, 'red');
 
 */
-	
+		document.getElementById("test").innerHTML = "throughNavCubeTextures";
+
 }
 
 //Sets up the camera, renderer, and canvas for the cube
@@ -874,6 +1018,8 @@ Navigate around different cube views (in both isometric mode and square mode)
 	Label sides so user knows what they are looking at
 	Based on OnShape's navigation UI?
 		Up, Down, Left, Right, Rotate CW, Rotate CCW in steps
+	Also add drag to rotate on main cube?
+		This thread has examples using OrbitControls which allow for drag control: https://discourse.threejs.org/t/mapping-text-onto-faces-of-cube/25358/17
 Cube solving functions
 	-My own
 	-Optimized solve
@@ -965,5 +1111,9 @@ Rotation positions:
 
 
 ********************/
+
+
+
+
 
 

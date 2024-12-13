@@ -12,4 +12,6 @@ npm install esbuild random-unit-below
 npm install esbuild getbuiltinmodule-ponyfill
 npm install --save comlink
 
-
+You also need to use threex to use DynamicTexture for writing text on faces.
+You'll need to install this by running:
+npm install esbuild threex
