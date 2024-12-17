@@ -6,8 +6,8 @@ import DynamicTexture from '/lib/DynamicTexture/DynamicTextureClass.js';
 //The proportion of the window width and height the canvases will take up
 const windowWidthPercentageForCubeCanvas = 0.6;
 const windowHeightPercentageForCubeCanvas = 0.6;
-const windowWidthPercentageForNavigationCanvas = 0.2;			//Currently unused
-const windowHeightPercentageForNavigationCanvas = 0.2;			//Currently unused
+const windowWidthPercentageForNavigationCanvas = 0.1;
+const windowHeightPercentageForNavigationCanvas = 0.1;			//Currently unused
 
 //Constants for colors
 const greenColor = 0x009b48;
@@ -277,7 +277,8 @@ function startCubeScene() {
 function startNavScene() {
 
 	//Define the canvas size and aspect ratio based on a proportion of the window size
-	var canvasWidth = document.getElementById("navigationCanvasContainer").parentElement.getBoundingClientRect().width;
+	var canvasWidth = window.innerWidth * windowWidthPercentageForNavigationCanvas;
+	//var canvasWidth = document.getElementById("navigationCanvasContainer").parentElement.getBoundingClientRect().width;
 	var canvasHeight = canvasWidth;
 	var aspect = canvasWidth / canvasHeight;
 	
@@ -776,8 +777,12 @@ function smoothCoordinate(coordinateToSmooth) {
 //Rotates the nav cube and the cube counterclockwise by one step
 window.rotateCCW = function() {
 	
-	
-	
+	alert(navCamera.rotation.x + ", " + navCamera.rotation.y + ", " + navCamera.rotation.z);
+	navCamera.rotation.set(0, 0, Math.PI/8);
+	//navCamera.lookAt(0, 0, 0);
+	//navCamera.up.set()
+	alert(navCamera.rotation.x + ", " + navCamera.rotation.y + ", " + navCamera.rotation.z);
+
 }
 
 //Scrambles the cube
@@ -863,10 +868,8 @@ window.frontCamera = function() {
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Based on OnShape's navigation UI?
-		Up, Down, Left, Right, Rotate CW, Rotate CCW in steps
-	Also add drag to rotate on main cube?
-		This thread has examples using OrbitControls which allow for drag control: https://discourse.threejs.org/t/mapping-text-onto-faces-of-cube/25358/17
+	Add drag to rotate on main cube
+	Make nav cube a cuboctahedron and just click to snap to different square and isometric views on the nav cube
 Cube solving functions
 	-My own
 	-Optimized solve
