@@ -900,6 +900,9 @@ Algorithm Notation:
 	A 2 (U2, D2, R2, L2, F2, B2) indicates a single 180 degree turn of the face.
 			
 Rotation positions:
+	The 
+
+
 	Define:
 		Faces: front, left, right, etc. at 0,0,0 rotation
 		Positions:
