@@ -869,7 +869,7 @@ window.frontCamera = function() {
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Link OrbitControls between the cube and nav cube
+	Link OrbitControls between the cube and nav cube: https://stackoverflow.com/questions/54973801/use-one-orbitcontrols-with-two-cameras-in-threejs
 	Make nav cube a cuboctahedron and just click to snap to different square and isometric views on the nav cube
 Cube solving functions
 	-My own
