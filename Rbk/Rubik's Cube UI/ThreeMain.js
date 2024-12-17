@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { randomScrambleForEvent } from '/lib/cubing.js/src/cubing/scramble';
 import DynamicTexture from '/lib/DynamicTexture/DynamicTextureClass.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 
 //The proportion of the window width and height the canvases will take up
@@ -33,6 +34,10 @@ var cubeRenderer;
 var navScene;
 var navCamera;
 var navRenderer;
+
+//Control objects for OrbitControls
+var cubeControls;
+var navControls;
 
 //Stores the current x, y, and z rotation positions.
 //We start with the X axis to the right, Y axis up, and Z axis coming out of the page.
@@ -243,7 +248,6 @@ function startCubeScene() {
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
 	cubeCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
 	cubeCamera.position.z = setCameraFromCubeSize();
-	cubeCamera.lookAt(0, 0, 0);
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
 	cubeRenderer = new THREE.WebGLRenderer();
@@ -251,7 +255,13 @@ function startCubeScene() {
 	cubeRenderer.setSize(canvasWidth, canvasHeight);
 	cubeRenderer.setAnimationLoop(animateCubeScene);
 	document.getElementById("cubeCanvasContainer").appendChild(cubeRenderer.domElement);
-		
+	
+	//Creates the OrbitControls controls nad disallows panning (we want the cube to stay centered)
+	cubeControls = new OrbitControls(cubeCamera, cubeRenderer.domElement);
+	cubeControls.enablePan = false;
+	cubeControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
+	cubeControls.update();
+	
 	//Create the scene
 	cubeScene = new THREE.Scene();
 	
@@ -285,7 +295,6 @@ function startNavScene() {
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
 	navCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
 	navCamera.position.z = 2.5;
-	navCamera.lookAt(0, 0, 0);
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
 	navRenderer = new THREE.WebGLRenderer();
@@ -293,7 +302,13 @@ function startNavScene() {
 	navRenderer.setSize(canvasWidth, canvasHeight);
 	navRenderer.setAnimationLoop(animateNavScene);
 	document.getElementById("navigationCanvasContainer").appendChild(navRenderer.domElement);
-		
+	
+	//Creates the OrbitControls controls nad disallows panning (we want the cube to stay centered)
+	navControls = new OrbitControls(navCamera, navRenderer.domElement);
+	navControls.enablePan = false;
+	navControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
+	navControls.update();
+	
 	//Create the scene
 	navScene = new THREE.Scene();
 	
@@ -306,7 +321,7 @@ function startNavScene() {
 //Sets the camera Z position based on the cube size
 function setCameraFromCubeSize() {
 	
-	return cubeSize + 4;
+	return cubeSize + 5;
 	
 }
 
@@ -774,17 +789,6 @@ function smoothCoordinate(coordinateToSmooth) {
 	
 }
 
-//Rotates the nav cube and the cube counterclockwise by one step
-window.rotateCCW = function() {
-	
-	alert(navCamera.rotation.x + ", " + navCamera.rotation.y + ", " + navCamera.rotation.z);
-	navCamera.rotation.set(0, 0, Math.PI/8);
-	//navCamera.lookAt(0, 0, 0);
-	//navCamera.up.set()
-	alert(navCamera.rotation.x + ", " + navCamera.rotation.y + ", " + navCamera.rotation.z);
-
-}
-
 //Scrambles the cube
 window.scrambleCube = async function() {
 	
@@ -839,7 +843,6 @@ window.testJS = function() {
 	navCamera.position.x = 1.5;
 	navCamera.position.y = 1.5;
 	navCamera.position.z = 1.5;
-	navCamera.lookAt(0, 0, 0);
 	
 }
 
@@ -849,7 +852,6 @@ window.isometricCamera = function() {
 	cubeCamera.position.x = setCameraFromCubeSize();
 	cubeCamera.position.y = setCameraFromCubeSize();
 	cubeCamera.position.z = setCameraFromCubeSize();
-	cubeCamera.lookAt(0, 0, 0);
 	
 }
 
@@ -859,7 +861,6 @@ window.frontCamera = function() {
 	cubeCamera.position.x = 0;
 	cubeCamera.position.y = 0;
 	cubeCamera.position.z = setCameraFromCubeSize();
-	cubeCamera.lookAt(0, 0, 0);
 
 }
  
@@ -868,7 +869,7 @@ window.frontCamera = function() {
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Add drag to rotate on main cube
+	Link OrbitControls between the cube and nav cube
 	Make nav cube a cuboctahedron and just click to snap to different square and isometric views on the nav cube
 Cube solving functions
 	-My own
@@ -901,6 +902,10 @@ Algorithm Notation:
 	No prime (U, D, R, L, F, B) indicates a single 90 degree turn clockwise when facing the face.
 	A prime (U', D', R', L', F', B') indicates a single 90 degree turn counterclockwise when facing the face.
 	A 2 (U2, D2, R2, L2, F2, B2) indicates a single 180 degree turn of the face.
+
+OrbitControls
+	A nice video here on how to implement it: https://www.youtube.com/watch?v=4ZgkMS5rH3E
+	This allows for very easy implementation of controls like rotating the camera with touch or left click, panning with right click, and zooming in and out with the mouse wheel
 			
 Rotation positions:
 	The 
