@@ -20,6 +20,13 @@ const yellowColor = 0xffd500;
 const borderColor = 0x000000;
 
 //Stores the face names for the nav cube in the order they get meshed
+//Face indices:
+//		Right: 0, 1
+//		Left: 2, 3
+//		Top: 4, 5
+//		Bottom: 6, 7
+//		Front: 8, 9
+//		Rear: 10, 11
 const faceNames = ["Right", "Left", "Top", "Bottom", "Front", "Rear"];
 
 //Stores the face textures for each face of the nav cube to allow for text to be put on it
@@ -65,6 +72,10 @@ var cubeArray = [];
 //The navigation cube object
 var navCube;
 
+//Variables for the raycasting (mouse tracking and face selection)
+var raycaster = new THREE.Raycaster();
+var mousePosition = new THREE.Vector2();
+
 //Functions to set up the cube canvas and cube elements within it
 setupCubeArray();
 startCubeScene();
@@ -72,6 +83,9 @@ startCubeScene();
 //Functions to set up the navigation canvas and cube element within it
 setupNavigationCube();
 startNavScene();
+
+//Stores the nav cube canvas element
+var navCubeCanvas = document.getElementById("navigationCanvasContainer");
 
 //Creates the array of cubes that define the Rubik's Cube
 function setupCubeArray() {
@@ -862,7 +876,6 @@ window.solveCube = function() {
 window.testJS = function() {
 
 	document.getElementById("test").innerHTML = "changed";
-	alert(cubeCamera.rotation.x + ", " + cubeCamera.rotation.y + ", " + cubeCamera.rotation.z);
 	
 }
 
@@ -881,13 +894,56 @@ window.frontCamera = function() {
 	cubeControls.update();
 
 }
+
+//Tracks the mouse location in the nav cube canvas
+window.mouseLocation = function(event) {
+	
+	var navCanvasDimensions = navCubeCanvas.getBoundingClientRect();
+	
+    //Normalize mouse coordinates to range between -1 and 1
+    mousePosition.x = ((event.clientX - navCanvasDimensions.left) / navCubeCanvas.getBoundingClientRect().width) * 2 - 1;
+    mousePosition.y = -((event.clientY - navCanvasDimensions.top) / navCubeCanvas.getBoundingClientRect().height) * 2 + 1; 
+
+}
+
+//Finds the selected face of the nav cube
+window.checkForFace = function(event) {
+	
+    raycaster.setFromCamera(mousePosition, navCamera);
+
+	//Finds all intersected objects along the ray
+    const intersects = raycaster.intersectObjects(navScene.children);
+
+    if (intersects.length > 0) {		//If there are object(s) intersected by the ray
+		
+		//Filters the intersected objects for meshes
+        const res = intersects.filter(res => res.object.type === 'Mesh');
+
+        if (res.length > 0) {			//If there are meshes intersected by the ray
+			
+            const selectedFace = res[0].face;
+
+			alert("face: " + res[0].faceIndex);
+			
+        }
+		
+    }
+	
+}
+
  
 
 /*********** NOTES
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Make nav cube a cuboctahedron and just click to snap to different square and isometric views on the nav cube
+	Make nav cube a truncated cube and just click to snap to different square and isometric views on the nav cube
+		Use raycaster to know what face was selected
+			
+		Make truncated cube
+			https://stemkoski.github.io/Three.js/Polyhedra.html
+			https://discourse.threejs.org/t/how-to-truncate-geometry-by-vertex/17561
+		Create and link jump functions to each face
 Cube solving functions
 	-My own
 	-Optimized solve
