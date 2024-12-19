@@ -53,14 +53,17 @@ var zRotationPos = 0;						//Currently unused
 //Cube size (3 = 3x3, 4 = 4x4, etc.)
 const cubeSize = 3;
 
+//For zoom ratios between the cube and nav cube
+const initCubeZoom = setCameraFromCubeSize();
+var cubeZoom = initCubeZoom;
+const navCubeZoom = 2.5;
+var zoomRatio = cubeZoom/navCubeZoom;
+
 //Array to hold the cube objects comprising the entire cube
 var cubeArray = [];
 
 //The navigation cube object
 var navCube;
-
-//Stores the angle step size each turn of the cube will make when using the nav buttons
-const navCubeStepSize = Math.PI / 4;
 
 //Functions to set up the cube canvas and cube elements within it
 setupCubeArray();
@@ -247,7 +250,7 @@ function startCubeScene() {
 	
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
 	cubeCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeCamera.position.z = cubeZoom;
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
 	cubeRenderer = new THREE.WebGLRenderer();
@@ -261,6 +264,16 @@ function startCubeScene() {
 	cubeControls.enablePan = false;
 	cubeControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
 	cubeControls.update();
+	
+	//Links these controls to mirror the movement of the nav cube
+	cubeControls.addEventListener( 'change', () => {
+
+		cubeZoom = cubeCamera.position.length();		//Updates the zoom and zoom ratio to keep the nav cube at the same zoom
+		zoomRatio = cubeZoom/navCubeZoom;
+		navCamera.position.set(cubeCamera.position.x / zoomRatio, cubeCamera.position.y / zoomRatio, cubeCamera.position.z / zoomRatio);
+		navCamera.rotation.copy( cubeCamera.rotation );
+
+	} );
 	
 	//Create the scene
 	cubeScene = new THREE.Scene();
@@ -294,7 +307,7 @@ function startNavScene() {
 	
 	//Create the camera and move it away from the origin so it is outside of the cube bounds
 	navCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	navCamera.position.z = 2.5;
+	navCamera.position.z = navCubeZoom;
 
 	//Create the renderer, define the animate function, and create the canvas in the HTML file
 	navRenderer = new THREE.WebGLRenderer();
@@ -306,8 +319,17 @@ function startNavScene() {
 	//Creates the OrbitControls controls nad disallows panning (we want the cube to stay centered)
 	navControls = new OrbitControls(navCamera, navRenderer.domElement);
 	navControls.enablePan = false;
+	navControls.enableZoom = false;
 	navControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
 	navControls.update();
+	
+	//Links these controls to mirror the movement of the cube
+	navControls.addEventListener( 'change', () => {
+
+		cubeCamera.position.set(navCamera.position.x * zoomRatio, navCamera.position.y * zoomRatio, navCamera.position.z * zoomRatio);
+		cubeCamera.rotation.copy( navCamera.rotation );
+
+	} );
 	
 	//Create the scene
 	navScene = new THREE.Scene();
@@ -840,27 +862,23 @@ window.solveCube = function() {
 window.testJS = function() {
 
 	document.getElementById("test").innerHTML = "changed";
-	navCamera.position.x = 1.5;
-	navCamera.position.y = 1.5;
-	navCamera.position.z = 1.5;
+	alert(cubeCamera.rotation.x + ", " + cubeCamera.rotation.y + ", " + cubeCamera.rotation.z);
 	
 }
 
 //Moves the camera to an isometric view
 window.isometricCamera = function() {
 
-	cubeCamera.position.x = setCameraFromCubeSize();
-	cubeCamera.position.y = setCameraFromCubeSize();
-	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeControls.object.position.set(initCubeZoom, initCubeZoom, initCubeZoom);
+	cubeControls.update();
 	
 }
 
 //Moves the camera to the front view
 window.frontCamera = function() {
 
-	cubeCamera.position.x = 0;
-	cubeCamera.position.y = 0;
-	cubeCamera.position.z = setCameraFromCubeSize();
+	cubeControls.object.position.set(0, 0, initCubeZoom);
+	cubeControls.update();
 
 }
  
@@ -869,7 +887,6 @@ window.frontCamera = function() {
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
-	Link OrbitControls between the cube and nav cube: https://stackoverflow.com/questions/54973801/use-one-orbitcontrols-with-two-cameras-in-threejs
 	Make nav cube a cuboctahedron and just click to snap to different square and isometric views on the nav cube
 Cube solving functions
 	-My own
