@@ -31,6 +31,9 @@ const navCubeHighlightedColor = "#D9D9D9";
 //		Rear: 10, 11
 const faceNames = ["Right", "Left", "Top", "Bottom", "Front", "Rear"];
 
+//Keeps track of which face is highlighted. No face = -1
+var highlightedFace = -1;
+
 //Stores the face textures for each face of the nav cube to allow for text to be put on it
 var navFaceTextures = [];
 
@@ -880,12 +883,22 @@ window.mouseLocation = function(event) {
 
 }
 
-//Finds the selected face of the nav cube
-window.checkForFace = function(event) {
+//Handler for mouseup event in the nav canvas
+window.navCanvasMouseUp = function(event) {
 	
 	//If isDragging is false, there was a face selection
 	if (!isDragging) {
-		raycaster.setFromCamera(mousePosition, navCamera);
+		
+		checkForFace();
+		
+	}	
+	
+}
+
+//Finds the selected face of the nav cube
+function checkForFace() {
+	
+	raycaster.setFromCamera(mousePosition, navCamera);
 
 		//Finds all intersected objects along the ray
 		const intersects = raycaster.intersectObjects(navScene.children);
@@ -900,43 +913,19 @@ window.checkForFace = function(event) {
 				const selectedFace = res[0].face;
 				
 				document.getElementById("test").innerHTML = res[0].faceIndex;
-
-				//alert(navCube.material[0]);
-				//
+		
+				//Gets the highlighted face's index in navFaceTextures
+				highlightedFace = Math.round((res[0].faceIndex - 0.5) / 2);
 		
 				navFaceTextures[0].texture.needsUpdate = true;
 				navFaceTextures[0].clear(navCubeHighlightedColor).drawText("TEST", undefined, 300, 'black');
-				alert("done");
 				
-				
-/*
-mesh.geometry.faces[ 5 ].color.setHex( 0x00ffff ); 
-
-
-
-const face = intersects[ 0 ].face;
-const color = new THREE.Color( Math.random() * 0xffffff ); // random color
-
-const colorAttribute = geometry.getAttribute( 'color' );
-
-colorAttribute.setXYZ( face.a, color.r, color.g, color.b );
-colorAttribute.setXYZ( face.b, color.r, color.g, color.b );
-colorAttribute.setXYZ( face.c, color.r, color.g, color.b );
-
-colorAttribute.needsUpdate = true;
-
-*/
-
-
-
 				//alert("face: " + res[0].faceIndex);
 				
 			}
 			
 		}
-		
-	}
-	
+					///Else????
 }
 
 
