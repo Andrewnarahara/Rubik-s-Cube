@@ -18,6 +18,8 @@ const redColor = 0xb71234;
 const orangeColor = 0xff5800;
 const yellowColor = 0xffd500;
 const borderColor = 0x000000;
+const navCubeUnhighlightedColor = "#F5F5F5";
+const navCubeHighlightedColor = "#D9D9D9";
 
 //Stores the face names for the nav cube in the order they get meshed
 //Face indices:
@@ -175,46 +177,6 @@ function createCube() {
 
 //Sets up the navigation cube
 function setupNavigationCube() {
-	
-	//Solid faces
-	var cubeMaterials = [
-		new THREE.MeshBasicMaterial({
-			color:greenColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		}),
-		new THREE.MeshBasicMaterial({
-			color:blueColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		}),
-		new THREE.MeshBasicMaterial({
-			color:redColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		}),
-		new THREE.MeshBasicMaterial({
-			color:orangeColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		}),
-		new THREE.MeshBasicMaterial({
-			color:whiteColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		}),
-		new THREE.MeshBasicMaterial({
-			color:yellowColor,
-			polygonOffset: true,
-			polygonOffsetFactor: 1,		//Positive value pushes polygon further away
-			polygonOffsetUnits: 1
-		})
-	];
 
 	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
 	
@@ -231,7 +193,7 @@ function setupNavigationCube() {
 		
 	];
 
-	navCube = new THREE.Mesh(cubeGeometry, materials);//cubeMaterials);
+	navCube = new THREE.Mesh(cubeGeometry, materials);
 	
 	//Cube borders
 	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
@@ -250,7 +212,7 @@ function createNavCubeTextures() {
 		var dynamicTexture = new DynamicTexture(512, 512);
 		dynamicTexture.context.font = "bold 130px arial";
 		dynamicTexture.texture.needsUpdate = true;
-		dynamicTexture.clear('#F5F5F5').drawText(faceNames[i].toString(), undefined, 300, 'black');
+		dynamicTexture.clear(navCubeUnhighlightedColor).drawText(faceNames[i].toString(), undefined, 300, 'black');
 		navFaceTextures.push(dynamicTexture);
 		
 	}
@@ -936,8 +898,38 @@ window.checkForFace = function(event) {
 			if (res.length > 0) {			//If there are meshes intersected by the ray
 				
 				const selectedFace = res[0].face;
+				
+				document.getElementById("test").innerHTML = res[0].faceIndex;
 
-				alert("face: " + res[0].faceIndex);
+				//alert(navCube.material[0]);
+				//
+		
+				navFaceTextures[0].texture.needsUpdate = true;
+				navFaceTextures[0].clear(navCubeHighlightedColor).drawText("TEST", undefined, 300, 'black');
+				alert("done");
+				
+				
+/*
+mesh.geometry.faces[ 5 ].color.setHex( 0x00ffff ); 
+
+
+
+const face = intersects[ 0 ].face;
+const color = new THREE.Color( Math.random() * 0xffffff ); // random color
+
+const colorAttribute = geometry.getAttribute( 'color' );
+
+colorAttribute.setXYZ( face.a, color.r, color.g, color.b );
+colorAttribute.setXYZ( face.b, color.r, color.g, color.b );
+colorAttribute.setXYZ( face.c, color.r, color.g, color.b );
+
+colorAttribute.needsUpdate = true;
+
+*/
+
+
+
+				//alert("face: " + res[0].faceIndex);
 				
 			}
 			
@@ -947,14 +939,13 @@ window.checkForFace = function(event) {
 	
 }
 
- 
+
 
 /*********** NOTES
 
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
 	Make nav cube a truncated cube and just click to snap to different square and isometric views on the nav cube
-		Use raycaster to know what face was selected
 		Highlight face on mouseover
 		Make truncated cube
 			https://stemkoski.github.io/Three.js/Polyhedra.html
