@@ -57,6 +57,9 @@ var xRotationPos = Math.PI / 4;				//Currently unused
 var yRotationPos = Math.PI / 4;				//Currently unused
 var zRotationPos = 0;						//Currently unused
 
+//Stores a boolean which is used to determine if there was a click without dragging in the nav canvas (face selection)
+var isDragging = false;
+
 //Cube size (3 = 3x3, 4 = 4x4, etc.)
 const cubeSize = 3;
 
@@ -895,8 +898,17 @@ window.frontCamera = function() {
 
 }
 
+//When there is a mousedown event in the nav canvas, set "isDragging" to false in case there is a click without dragging (face selection)
+window.navCanvasMouseDown = function (event) {
+	
+	isDragging = false;
+	
+}
+
 //Tracks the mouse location in the nav cube canvas
 window.mouseLocation = function(event) {
+	
+	isDragging = true;		//Mousemove indicates a drag if there was a mousedown event, so set isDragging to true
 	
 	var navCanvasDimensions = navCubeCanvas.getBoundingClientRect();
 	
@@ -909,25 +921,29 @@ window.mouseLocation = function(event) {
 //Finds the selected face of the nav cube
 window.checkForFace = function(event) {
 	
-    raycaster.setFromCamera(mousePosition, navCamera);
+	//If isDragging is false, there was a face selection
+	if (!isDragging) {
+		raycaster.setFromCamera(mousePosition, navCamera);
 
-	//Finds all intersected objects along the ray
-    const intersects = raycaster.intersectObjects(navScene.children);
+		//Finds all intersected objects along the ray
+		const intersects = raycaster.intersectObjects(navScene.children);
 
-    if (intersects.length > 0) {		//If there are object(s) intersected by the ray
-		
-		//Filters the intersected objects for meshes
-        const res = intersects.filter(res => res.object.type === 'Mesh');
-
-        if (res.length > 0) {			//If there are meshes intersected by the ray
+		if (intersects.length > 0) {		//If there are object(s) intersected by the ray
 			
-            const selectedFace = res[0].face;
+			//Filters the intersected objects for meshes
+			const res = intersects.filter(res => res.object.type === 'Mesh');
 
-			alert("face: " + res[0].faceIndex);
+			if (res.length > 0) {			//If there are meshes intersected by the ray
+				
+				const selectedFace = res[0].face;
+
+				alert("face: " + res[0].faceIndex);
+				
+			}
 			
-        }
+		}
 		
-    }
+	}
 	
 }
 
@@ -939,7 +955,7 @@ To dos:
 Navigate around different cube views (in both isometric mode and square mode)
 	Make nav cube a truncated cube and just click to snap to different square and isometric views on the nav cube
 		Use raycaster to know what face was selected
-			
+		Highlight face on mouseover
 		Make truncated cube
 			https://stemkoski.github.io/Three.js/Polyhedra.html
 			https://discourse.threejs.org/t/how-to-truncate-geometry-by-vertex/17561
