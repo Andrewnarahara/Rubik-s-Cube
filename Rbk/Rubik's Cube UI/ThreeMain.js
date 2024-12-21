@@ -19,7 +19,7 @@ const orangeColor = 0xff5800;
 const yellowColor = 0xffd500;
 const borderColor = 0x000000;
 const navCubeUnhighlightedColor = "#F5F5F5";
-const navCubeHighlightedColor = "#D9D9D9";
+const navCubeHighlightedColor = "#99a5ab";
 
 //Stores the face names for the nav cube in the order they get meshed
 //Face indices:
@@ -91,6 +91,105 @@ startCubeScene();
 //Functions to set up the navigation canvas and cube element within it
 setupNavigationCube();
 startNavScene();
+
+
+
+
+
+
+
+
+//setupTruncatedCube();
+//startTruncatedCubeScene();
+
+//Sets up the navigation cube
+function setupTruncatedCube() {
+
+	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+	
+	createNavCubeTextures();
+	
+	var materials = [
+	
+		new THREE.MeshBasicMaterial({map: navFaceTextures[0].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[1].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[2].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[3].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[4].texture}),
+		new THREE.MeshBasicMaterial({map: navFaceTextures[5].texture})
+		
+	];
+
+	navCube = new THREE.Mesh(cubeGeometry, materials);
+	
+	//Cube borders
+	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
+	var borderMaterial = new THREE.LineBasicMaterial({color: borderColor});
+	var wireframe = new THREE.LineSegments(borderGeometry, borderMaterial);
+	navCube.add(wireframe);
+	
+}
+
+//Sets up the camera, renderer, and canvas for the navigation
+function startTruncatedCubeScene() {
+
+	//Define the canvas size and aspect ratio based on a proportion of the window size
+	var canvasWidth = window.innerWidth * windowWidthPercentageForNavigationCanvas;
+	//var canvasWidth = document.getElementById("navigationCanvasContainer").parentElement.getBoundingClientRect().width;
+	var canvasHeight = canvasWidth;
+	var aspect = canvasWidth / canvasHeight;
+	
+	//Create the camera and move it away from the origin so it is outside of the cube bounds
+	navCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
+	navCamera.position.z = navCubeZoom;
+
+	//Create the renderer, define the animate function, and create the canvas in the HTML file
+	navRenderer = new THREE.WebGLRenderer();
+	navRenderer.setClearColor(0xCFCFCF, 1);
+	navRenderer.setSize(canvasWidth, canvasHeight);
+	navRenderer.setAnimationLoop(animateNavScene);
+	document.getElementById("navigationCanvasContainer").appendChild(navRenderer.domElement);
+	
+	//Creates the OrbitControls controls nad disallows panning (we want the cube to stay centered)
+	navControls = new OrbitControls(navCamera, navRenderer.domElement);
+	navControls.enablePan = false;
+	navControls.enableZoom = false;
+	navControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
+	navControls.update();
+	
+	//Links these controls to mirror the movement of the cube
+	navControls.addEventListener( 'change', () => {
+
+		cubeCamera.position.set(navCamera.position.x * zoomRatio, navCamera.position.y * zoomRatio, navCamera.position.z * zoomRatio);
+		cubeCamera.rotation.copy( navCamera.rotation );
+
+	} );
+	
+	//Create the scene
+	navScene = new THREE.Scene();
+	
+	//Add the navigation cube to the scene and set its position
+	navScene.add(navCube);
+	navCube.position.set(0, 0, 0);
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //Stores the nav cube canvas element
 var navCubeCanvas = document.getElementById("navigationCanvasContainer");
@@ -863,6 +962,17 @@ window.frontCamera = function() {
 
 }
 
+//Used to key highlighted face positions to functions
+//["Right", "Left", "Top", "Bottom", "Front", "Rear"];
+const snapToPosition = {
+	0: () => setCubeDirection(1, 0, 0),
+	1: () => setCubeDirection(-1, 0, 0),
+	2: () => setCubeDirection(0, 1, 0),
+	3: () => setCubeDirection(0, -1, 0),
+	4: () => setCubeDirection(0, 0, 1),
+	5: () => setCubeDirection(0, 0, -1)
+};
+
 //When there is a mousedown event in the nav canvas, set "isDragging" to false in case there is a click without dragging (face selection)
 window.navCanvasMouseDown = function (event) {
 	
@@ -881,6 +991,9 @@ window.mouseLocation = function(event) {
     mousePosition.x = ((event.clientX - navCanvasDimensions.left) / navCubeCanvas.getBoundingClientRect().width) * 2 - 1;
     mousePosition.y = -((event.clientY - navCanvasDimensions.top) / navCubeCanvas.getBoundingClientRect().height) * 2 + 1; 
 
+	//Determine if any faces are moused over, highlight the appropriate face
+	checkForFace();
+
 }
 
 //Handler for mouseup event in the nav canvas
@@ -889,43 +1002,71 @@ window.navCanvasMouseUp = function(event) {
 	//If isDragging is false, there was a face selection
 	if (!isDragging) {
 		
-		checkForFace();
+		checkForFace();							//Highlight the appropriate face and set highlightedFace
+		snapToPosition[highlightedFace]();		//Jump to the selected position
+		cubeControls.update();
 		
-	}	
+	}
 	
 }
 
-//Finds the selected face of the nav cube
+//Finds the selected face of the nav cube, highlights the appropriate face
 function checkForFace() {
+	
+	//Set the current highlighted face (if any) back to its unhighlighted value
+	if (highlightedFace != -1) {
+		
+		navFaceTextures[highlightedFace].texture.needsUpdate = true;
+		navFaceTextures[highlightedFace].clear(navCubeUnhighlightedColor).drawText(faceNames[highlightedFace].toString(), undefined, 300, 'black');
+		
+	}
+	
+	//Start by setting no face as intersected. If there is an intersected face, we'll make it as such later
+	highlightedFace = -1;
 	
 	raycaster.setFromCamera(mousePosition, navCamera);
 
-		//Finds all intersected objects along the ray
-		const intersects = raycaster.intersectObjects(navScene.children);
+	//Finds all intersected objects along the ray
+	const intersects = raycaster.intersectObjects(navScene.children);
 
-		if (intersects.length > 0) {		//If there are object(s) intersected by the ray
-			
-			//Filters the intersected objects for meshes
-			const res = intersects.filter(res => res.object.type === 'Mesh');
+	if (intersects.length > 0) {		//If there are object(s) intersected by the ray
+		
+		//Filters the intersected objects for meshes
+		const res = intersects.filter(res => res.object.type === 'Mesh');
 
-			if (res.length > 0) {			//If there are meshes intersected by the ray
+		if (res.length > 0) {			//If there are meshes intersected by the ray
 				
-				const selectedFace = res[0].face;
-				
-				document.getElementById("test").innerHTML = res[0].faceIndex;
-		
-				//Gets the highlighted face's index in navFaceTextures
-				highlightedFace = Math.round((res[0].faceIndex - 0.5) / 2);
-		
-				navFaceTextures[0].texture.needsUpdate = true;
-				navFaceTextures[0].clear(navCubeHighlightedColor).drawText("TEST", undefined, 300, 'black');
-				
-				//alert("face: " + res[0].faceIndex);
-				
-			}
+			//Gets the highlighted face's index in navFaceTextures
+			highlightedFace = Math.round((res[0].faceIndex - 0.5) / 2);
 			
+			//Sets the selected face's color to the highlight color
+			navFaceTextures[highlightedFace].texture.needsUpdate = true;
+			navFaceTextures[highlightedFace].clear(navCubeHighlightedColor).drawText(faceNames[highlightedFace].toString(), undefined, 300, 'black');
+							
 		}
-					///Else????
+		
+	}
+
+}
+
+//Returns a 3D vector in the specified direction with the specified magnitude
+function create3DVectorWithMagnitude(xComp, yComp, zComp, magnitude) {
+	
+	var vectorMagnitude = Math.sqrt((xComp * xComp) + (yComp * yComp) + (zComp * zComp));
+
+	return new THREE.Vector3((xComp * (magnitude / vectorMagnitude)), (yComp * (magnitude / vectorMagnitude)), (zComp * (magnitude / vectorMagnitude)));
+	
+}
+
+//Jumps to the cube view from the specified vector direction
+function setCubeDirection(xDir, yDir, zDir) {
+	
+	//Gets a vector in the specified direction with the specified magnitude (the current zoom for the cube)
+	const viewVector = create3DVectorWithMagnitude(xDir, yDir, zDir, cubeZoom);
+
+	//Set the camera position to the specified direction at the current zoom level
+	cubeControls.object.position.set(viewVector.x, viewVector.y, viewVector.z);
+	
 }
 
 
@@ -935,7 +1076,6 @@ function checkForFace() {
 To dos:
 Navigate around different cube views (in both isometric mode and square mode)
 	Make nav cube a truncated cube and just click to snap to different square and isometric views on the nav cube
-		Highlight face on mouseover
 		Make truncated cube
 			https://stemkoski.github.io/Three.js/Polyhedra.html
 			https://discourse.threejs.org/t/how-to-truncate-geometry-by-vertex/17561

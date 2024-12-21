@@ -7,7 +7,7 @@
 		<title>Rubik's Cube Animation</title>
 		
 
-		<script type="module" crossorigin src="/assets/index-TMOS3DIt.js"></script>
+		<script type="module" crossorigin src="/assets/index-wpcG1CP4.js"></script>
 		<link rel="stylesheet" crossorigin href="/assets/index-BxKBzkJb.css">
 	</head>
 
@@ -83,7 +83,7 @@
 		<button onclick = "frontCamera()">Front View</button>
 		<button onclick = "scrambleCube()">Scramble Cube</button>
 		
-		<div id = "navigationCanvasContainer" onclick="checkForFace(event)" onmousemove="mouseLocation(event)">
+		<div id = "navigationCanvasContainer" onmousedown="navCanvasMouseDown(event)" onmouseup="navCanvasMouseUp(event)" onmousemove="mouseLocation(event)">
 		</div>
 	
 	</body>
