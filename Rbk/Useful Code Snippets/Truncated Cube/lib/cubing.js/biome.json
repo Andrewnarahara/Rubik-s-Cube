@@ -1,0 +1,51 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "ignore": [
+      "./.temp",
+      "./dist",
+      "./package.json",
+      "./*/index.d.ts",
+      "./src/cubing/vendor/mit/cs0x7f/**/*",
+      "./src/cubing/vendor/mpl/twsearch/*.js",
+      "./src/cubing/vendor/mpl/xyzzy/*.js",
+      "./src/sites/experiments.cubing.net/cubing.js/rust/wasm/*.js",
+      "./src/sites/experiments.cubing.net/cubing.js/rust/wasm/*.d.ts",
+      "./src/test/vendor/bun-types-workaround.d.ts"
+    ]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "nursery": {},
+      "complexity": {
+        "useLiteralKeys": "off"
+      },
+      "style": {
+        "noNegationElse": "off",
+        "noShoutyConstants": "off",
+        "noInferrableTypes": "off",
+        "noNonNullAssertion": "off",
+        "noParameterAssign": "off",
+        "useEnumInitializers": "off",
+        "noUselessElse": "off",
+        "useNumberNamespace": "off"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "off",
+        "noExplicitAny": "off"
+      },
+      "performance": {
+        "noDelete": "off"
+      }
+    }
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "organizeImports": {
+    "enabled": false
+  }
+}

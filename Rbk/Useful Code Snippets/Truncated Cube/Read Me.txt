@@ -1,0 +1,17 @@
+To run:
+Open a terminal window
+Navigate to this folder
+Run npx vite build
+Run npx vite
+Open the localhost link shown
+
+
+This uses cubing.js, which uses various modules (random-unit-below.js, getbuiltinmodule-ponyfill, comlink)
+You'll need to install these by running:
+npm install esbuild random-unit-below
+npm install esbuild getbuiltinmodule-ponyfill
+npm install --save comlink
+
+You also need to use threex to use DynamicTexture for writing text on faces.
+You'll need to install this by running:
+npm install esbuild threex

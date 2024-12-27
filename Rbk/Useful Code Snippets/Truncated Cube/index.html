@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+	
+		<meta charset="utf-8">
+		<title>Rubik's Cube Animation</title>
+		
+		<link rel="stylesheet" href="styles.css">
+		<script type="module" src="/ThreeMain.js"></script>
+
+	</head>
+
+	<body>
+		
+		<div id = "controlsContainer">
+			
+			<table id = "controlButtonsTable">
+				<tr>
+					<td>
+						<button id = "leftCCW" onclick = "leftCCW()">&uarr;</button>
+					</td>
+					<td>Left Face</td>
+					<td>
+						<button id = "leftCW" onclick = "leftCW()">&darr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "rightCW" onclick = "rightCW()">&uarr;</button>
+					</td>
+					<td>Right Face</td>
+					<td>
+						<button id = "rightCCW" onclick = "rightCCW()">&darr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "upCW" onclick = "upCW()">&larr;</button>
+					</td>
+					<td>Top Face</td>
+					<td>
+						<button id = "upCCW" onclick = "upCCW()">&rarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "downCCW" onclick = "downCCW()">&larr;</button>
+					</td>
+					<td>Bottom Face</td>
+					<td>
+						<button id = "downCW" onclick = "downCW()">&rarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "frontCW" onclick = "frontCW()">&orarr;</button>
+					</td>
+					<td>Front Face</td>
+					<td>
+						<button id = "frontCCW" onclick = "frontCCW()">&olarr;</button>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<button id = "backCW" onclick = "backCW()">&orarr;</button>
+					</td>
+					<td>Rear Face</td>
+					<td>
+						<button id = "backCCW" onclick = "backCCW()">&olarr;</button>
+					</td>
+				</tr>
+			</table>
+			
+		</div>
+		
+		<div id = "cubeCanvasContainer">
+		</div>
+		
+		<p id="test">Test</p>
+		<button onclick = "testJS()">Test Button</button>
+		<button onclick = "isometricCamera()">Isometric View</button>
+		<button onclick = "frontCamera()">Front View</button>
+		<button onclick = "scrambleCube()">Scramble Cube</button>
+		
+		<div id = "navigationCanvasContainer" onmousedown="navCanvasMouseDown(event)" onmouseup="navCanvasMouseUp(event)" onmousemove="mouseLocation(event)">
+		</div>
+	
+	</body>
+	
+</html>
