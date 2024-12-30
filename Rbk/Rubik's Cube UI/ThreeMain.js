@@ -11,12 +11,12 @@ const windowWidthPercentageForNavigationCanvas = 0.1;
 const windowHeightPercentageForNavigationCanvas = 0.1;			//Currently unused
 
 //Constants for colors
-const greenColor = 0x009b48;
-const blueColor = 0x0046ad;
-const whiteColor = 0xffffff;
-const redColor = 0xb71234;
-const orangeColor = 0xff5800;
-const yellowColor = 0xffd500;
+const greenColor = 0x009b48;		//(0, 155, 72) rgb
+const blueColor = 0x0046ad;			//(0, 70, 173) rgb
+const whiteColor = 0xffffff;		//(255, 255, 255) rgb
+const redColor = 0xb71234;			//(183, 18, 52) rgb
+const orangeColor = 0xff5800;		//(255, 88, 0) rgb
+const yellowColor = 0xffd500;		//(255, 213, 0) rgb
 const borderColor = 0x000000;
 const navCubeUnhighlightedColor = "#F5F5F5";
 const navCubeHighlightedColor = "#99a5ab";
@@ -51,17 +51,6 @@ var navRenderer;
 var cubeControls;
 var navControls;
 
-//Stores the current x, y, and z rotation positions.
-//We start with the X axis to the right, Y axis up, and Z axis coming out of the page.
-//Rotation axes:
-	//X always rotates around the same axis in space. So no matter what rotations have been done, x rotation will always rotate around an axis from left to right, with the default positive being CCW if viewed from the right
-	//Y
-	//Z always rotates around the same axis relative to a face as it moves around. So, if the white face is facing forwards at the start, it will always rotate around an axis perpendicular to this white face no matter how that face is moved. Default is CCW when facing it from the front
-//Then we rotate X 45 degrees (CCW from the right is positive) and Y 45 degrees (CCW from the top is positive) to get an isometric view
-var xRotationPos = Math.PI / 4;				//Currently unused
-var yRotationPos = Math.PI / 4;				//Currently unused
-var zRotationPos = 0;						//Currently unused
-
 //Stores a boolean which is used to determine if there was a click without dragging in the nav canvas (face selection)
 var isDragging = false;
 
@@ -77,6 +66,9 @@ var zoomRatio = cubeZoom/navCubeZoom;
 //Array to hold the cube objects comprising the entire cube
 var cubeArray = [];
 
+//Array to hold all piece positions (might be able to merge with cubeArray
+var piecePositions = [];
+
 //The navigation cube object
 var navCube;
 
@@ -91,105 +83,6 @@ startCubeScene();
 //Functions to set up the navigation canvas and cube element within it
 setupNavigationCube();
 startNavScene();
-
-
-
-
-
-
-
-
-//setupTruncatedCube();
-//startTruncatedCubeScene();
-
-//Sets up the navigation cube
-function setupTruncatedCube() {
-
-	var cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-	
-	createNavCubeTextures();
-	
-	var materials = [
-	
-		new THREE.MeshBasicMaterial({map: navFaceTextures[0].texture}),
-		new THREE.MeshBasicMaterial({map: navFaceTextures[1].texture}),
-		new THREE.MeshBasicMaterial({map: navFaceTextures[2].texture}),
-		new THREE.MeshBasicMaterial({map: navFaceTextures[3].texture}),
-		new THREE.MeshBasicMaterial({map: navFaceTextures[4].texture}),
-		new THREE.MeshBasicMaterial({map: navFaceTextures[5].texture})
-		
-	];
-
-	navCube = new THREE.Mesh(cubeGeometry, materials);
-	
-	//Cube borders
-	var borderGeometry = new THREE.EdgesGeometry(navCube.geometry); // or WireframeGeometry
-	var borderMaterial = new THREE.LineBasicMaterial({color: borderColor});
-	var wireframe = new THREE.LineSegments(borderGeometry, borderMaterial);
-	navCube.add(wireframe);
-	
-}
-
-//Sets up the camera, renderer, and canvas for the navigation
-function startTruncatedCubeScene() {
-
-	//Define the canvas size and aspect ratio based on a proportion of the window size
-	var canvasWidth = window.innerWidth * windowWidthPercentageForNavigationCanvas;
-	//var canvasWidth = document.getElementById("navigationCanvasContainer").parentElement.getBoundingClientRect().width;
-	var canvasHeight = canvasWidth;
-	var aspect = canvasWidth / canvasHeight;
-	
-	//Create the camera and move it away from the origin so it is outside of the cube bounds
-	navCamera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
-	navCamera.position.z = navCubeZoom;
-
-	//Create the renderer, define the animate function, and create the canvas in the HTML file
-	navRenderer = new THREE.WebGLRenderer();
-	navRenderer.setClearColor(0xCFCFCF, 1);
-	navRenderer.setSize(canvasWidth, canvasHeight);
-	navRenderer.setAnimationLoop(animateNavScene);
-	document.getElementById("navigationCanvasContainer").appendChild(navRenderer.domElement);
-	
-	//Creates the OrbitControls controls nad disallows panning (we want the cube to stay centered)
-	navControls = new OrbitControls(navCamera, navRenderer.domElement);
-	navControls.enablePan = false;
-	navControls.enableZoom = false;
-	navControls.target.set(0, 0, 0);			//Sets the center to (0, 0, 0) in case it isn't by default
-	navControls.update();
-	
-	//Links these controls to mirror the movement of the cube
-	navControls.addEventListener( 'change', () => {
-
-		cubeCamera.position.set(navCamera.position.x * zoomRatio, navCamera.position.y * zoomRatio, navCamera.position.z * zoomRatio);
-		cubeCamera.rotation.copy( navCamera.rotation );
-
-	} );
-	
-	//Create the scene
-	navScene = new THREE.Scene();
-	
-	//Add the navigation cube to the scene and set its position
-	navScene.add(navCube);
-	navCube.position.set(0, 0, 0);
-	
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Stores the nav cube canvas element
 var navCubeCanvas = document.getElementById("navigationCanvasContainer");
@@ -932,20 +825,6 @@ function parseAlgorithm(algorithmStepsString) {
 	
 }
 
-//Solves the cube
-window.solveCube = function() {
-		
-	alert("This function is not ready yet");
-	
-}
-
-//A test function for testing things
-window.testJS = function() {
-
-	document.getElementById("test").innerHTML = "changed";
-	
-}
-
 //Moves the camera to an isometric view
 window.isometricCamera = function() {
 
@@ -1069,6 +948,92 @@ function setCubeDirection(xDir, yDir, zDir) {
 	
 }
 
+//Solves the cube using Andrew's method
+window.solveCubeAndrewMethod = function() {
+	
+	//Analyze positions of the pieces
+	analyzePiecePositions();
+
+	//Solve green face (in simulation, it's the right face)
+	solveGreenFace();
+	
+	//Solve second layer
+	
+	//Solve top cross
+	
+	//Solve top corners
+	
+	
+	alert("This function is not ready yet");
+	
+}
+
+//Analyzes the positions of the pieces and stores them in an array to make solving it easier
+function analyzePiecePositions() {
+	
+	//Creates an empty shell of piecePositions so that we can fill it in
+	for (var i = 0; i < cubeSize; i++) {
+		
+		piecePositions.push([]);
+		
+		for (var j = 0; j < cubeSize; j++) {
+			
+			piecePositions[i].push([]);
+			
+			for (var k = 0; k < cubeSize; k++) {
+				
+				piecePositions[i][j].push([]);
+				
+			}
+			
+		}
+		
+	}
+	
+		getPiecePosition(0, 0, 0);
+		
+		//alert(piecePositions[0][0][0].material[0].color.getHex());
+		//alert(greenColor);
+	
+}
+
+//Returns the solved position of the piece in cubeArray to be stored in piecePositions
+function getSolvedPiecePosition(i, j, k) {
+	
+	//Get the position of the current piece
+	const currentPiece = cubeArray[i][j][k];
+	var currentPiecePosition = [currentPiece.position.x, currentPiece.position.y, currentPiece.position.z];
+	
+	alert(currentPiecePosition);
+	
+	return [];
+
+}
+
+//Solves the green face
+function solveGreenFace() {
+	
+	
+	
+}
+
+//Solves the cube using the CFOP method
+window.solveCubeCFOPMethod = function() {
+	
+	//
+	
+	
+	alert("This function is not ready yet");
+	
+}
+
+//A test function for testing things
+window.testJS = function() {
+
+	document.getElementById("test").innerHTML = "changed";
+	
+}
+
 
 
 /*********** NOTES
@@ -1084,6 +1049,9 @@ Cube solving functions
 	-My own
 	-Optimized solve
 Animate cube motions
+Analyze cube with camera, get piece positions
+Change the way cubeArray is handled to have it reflect the current piece positions?
+
 
 
 Testing cube algorithms
@@ -1115,67 +1083,14 @@ Algorithm Notation:
 OrbitControls
 	A nice video here on how to implement it: https://www.youtube.com/watch?v=4ZgkMS5rH3E
 	This allows for very easy implementation of controls like rotating the camera with touch or left click, panning with right click, and zooming in and out with the mouse wheel
-			
-Rotation positions:
-	The 
-
-
-	Define:
-		Faces: front, left, right, etc. at 0,0,0 rotation
-		Positions:
-			Orthographic: single face facing front, others are hidden
-				For each face facing front, there are 4 different rotational orientations possible.
-				There are 6 different faces, so there are a total of 4 * 6 = 24 different orientations needed.
-			Isometric: 3 faces equally visible
-				For each combinations of faces facing front, there are 3 different rotational orientations possible.
-				There are 8 different combinations of faces facing front, so 3 * 8 = 24 different orientations needed.
-		Coordinate systems:
-			The one I will track is based on rotations from the 
-		
-	Orthographic:
 	
-		Default (front, at 0,0,0 rotation)
-		cubeArray[0][0][0].rotation.x = 0;
-		cubeArray[0][0][0].rotation.y = 0;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-		Turn to left (right faces front)
-		cubeArray[0][0][0].rotation.x = 0;
-		cubeArray[0][0][0].rotation.y = -Math.PI/2;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-		Turn to right (left faces front)
-		cubeArray[0][0][0].rotation.x = 0;
-		cubeArray[0][0][0].rotation.y = Math.PI/2;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-		Turn to up (bottom faces front)
-		cubeArray[0][0][0].rotation.x = -Math.PI/2;
-		cubeArray[0][0][0].rotation.y = 0;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-		Turn to down (top faces front)
-		cubeArray[0][0][0].rotation.x = Math.PI/2;
-		cubeArray[0][0][0].rotation.y = 0;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-		Turn 180 (about x axis)
-		cubeArray[0][0][0].rotation.x = Math.PI;
-		cubeArray[0][0][0].rotation.y = 0;
-		cubeArray[0][0][0].rotation.z = 0;
-		
-	Isometric rotation positions:
-		
-		Front, left, top:
-		
-		Front, right, top:
-		
-		Front, right, bottom:
-		
-		Front, bottom, right:
-
-
-
+piecePositions array
+	Stores the solved position of the piece in the specified position.
+	Zero indexed starting from the back bottom left corner.
+		So piece (0, 0, 0) will be in the back bottom left corner.
+		For a 3x3 cube, (2, 2, 2) will be in the front top right corner.
+	This means that piecePositions[0][0][0] stores the position where the piece in the back bottom left corner should go when the cube is solved.
+	Solved positions are also zero indexed.
 
 ********************/
 
