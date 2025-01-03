@@ -1,4 +1,4 @@
-import{p as H,b as N,j as y}from"./index-BsZm_AG-.js";import{p as E}from"./parseSGS-DS6V_bUw.js";let J=null;async function pB(){return J??(J=K())}async function K(){return E(await H.fto.kpuzzle(),`SubgroupSizes 24 12 11 12 12 11 10 9 11 8 10 9 7 8 10 10 6 9 8 5 7 6 5 4 4 8 7 3 6 6 360
+import{p as H,b as N,j as y}from"./index-OVD8mU0B.js";import{p as E}from"./parseSGS-BokNUgyO.js";let J=null;async function pB(){return J??(J=K())}async function K(){return E(await H.fto.kpuzzle(),`SubgroupSizes 24 12 11 12 12 11 10 9 11 8 10 9 7 8 10 10 6 9 8 5 7 6 5 4 4 8 7 3 6 6 360
 
 Alg T
 Alg B

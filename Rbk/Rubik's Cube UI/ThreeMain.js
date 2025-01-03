@@ -11,12 +11,12 @@ const windowWidthPercentageForNavigationCanvas = 0.1;
 const windowHeightPercentageForNavigationCanvas = 0.1;			//Currently unused
 
 //Constants for colors
-const greenColor = 0x009b48;		//(0, 155, 72) rgb
-const blueColor = 0x0046ad;			//(0, 70, 173) rgb
-const whiteColor = 0xffffff;		//(255, 255, 255) rgb
-const redColor = 0xb71234;			//(183, 18, 52) rgb
-const orangeColor = 0xff5800;		//(255, 88, 0) rgb
-const yellowColor = 0xffd500;		//(255, 213, 0) rgb
+const greenColor = 0x009b48;		//(0, 155, 72) rgb,		39752 int
+const blueColor = 0x0046ad;			//(0, 70, 173) rgb		18093 int
+const redColor = 0xb71234;			//(183, 18, 52) rgb		11997748 int
+const orangeColor = 0xff5800;		//(255, 88, 0) rgb		16734208 int
+const whiteColor = 0xffffff;		//(255, 255, 255) rgb	16777215 int
+const yellowColor = 0xffd500;		//(255, 213, 0) rgb		16766208 int
 const borderColor = 0x000000;
 const navCubeUnhighlightedColor = "#F5F5F5";
 const navCubeHighlightedColor = "#99a5ab";
@@ -30,6 +30,9 @@ const navCubeHighlightedColor = "#99a5ab";
 //		Front: 8, 9
 //		Rear: 10, 11
 const faceNames = ["Right", "Left", "Top", "Bottom", "Front", "Rear"];
+
+//Stores the colors of each face (same order as faceNames)
+var faceColors = [];
 
 //Keeps track of which face is highlighted. No face = -1
 var highlightedFace = -1;
@@ -55,7 +58,7 @@ var navControls;
 var isDragging = false;
 
 //Cube size (3 = 3x3, 4 = 4x4, etc.)
-const cubeSize = 3;
+const cubeSize = 4;
 
 //For zoom ratios between the cube and nav cube
 const initCubeZoom = setCameraFromCubeSize();
@@ -952,7 +955,7 @@ function setCubeDirection(xDir, yDir, zDir) {
 window.solveCubeAndrewMethod = function() {
 	
 	//Analyze positions of the pieces
-	analyzePiecePositions();
+	getPiecePositions();
 
 	//Solve green face (in simulation, it's the right face)
 	solveGreenFace();
@@ -969,7 +972,7 @@ window.solveCubeAndrewMethod = function() {
 }
 
 //Analyzes the positions of the pieces and stores them in an array to make solving it easier
-function analyzePiecePositions() {
+function getPiecePositions() {
 	
 	//Creates an empty shell of piecePositions so that we can fill it in
 	for (var i = 0; i < cubeSize; i++) {
@@ -989,11 +992,154 @@ function analyzePiecePositions() {
 		}
 		
 	}
+		
+	//Define the face colors relative to each other and map them to faceColors
+	defineCubeFormat();
 	
-		getPiecePosition(0, 0, 0);
+	//Go piece by piece and determine where each should be based on the cube format
+	
+		//getPiecePosition(0, 0, 0);
 		
 		//alert(piecePositions[0][0][0].material[0].color.getHex());
 		//alert(greenColor);
+	
+}
+
+//Determines the format for the cube (color positions of each face relative to one another)
+//For cubes with fixed centers (3x3, 5x5, 7x7, etc.) this is much easier, but for cubes like 4x4 and 6x6, we must determine this based on the corners
+//Fills out this format in faceColors, a 1D array with the face order Right, Left, Top, Bottom, Front, Rear
+function defineCubeFormat() {
+		
+	//Stores important indexes in cubeArray
+	const cubeIndexMiddle = (cubeSize - 1) / 2;
+	const cubeIndexMax = cubeSize - 1;
+		
+	if (cubeSize % 2 == 1) {		//Use centers to determine format
+		
+		faceColors.push(cubeArray[cubeIndexMax][cubeIndexMiddle][cubeIndexMiddle].material[0].color.getHex());		//Right face color
+		faceColors.push(cubeArray[0][cubeIndexMiddle][cubeIndexMiddle].material[1].color.getHex());					//Left face color
+		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMax][cubeIndexMiddle].material[2].color.getHex());		//Top face color
+		faceColors.push(cubeArray[cubeIndexMiddle][0][cubeIndexMiddle].material[3].color.getHex());					//Bottom face color
+		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMiddle][cubeIndexMax].material[4].color.getHex());		//Front face color
+		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMiddle][0].material[5].color.getHex());					//Rear face color
+
+	} else {						//Use corners to determine format.
+		
+		//Fills faceColors with invalid color integers (so that they won't match to any colors compared to them), to be filled in later with valid colors
+		for (var i = 0; i < 6; i++) {
+			
+			faceColors.push(-1);
+			
+		}
+		
+		alert(faceColors.length);
+		
+		//Map the colors to faceColors
+		mapColorsFromCorners()
+		
+	}
+	
+	alert(faceColors);
+	
+}
+
+//Fills out faceColors with the appropriate colors mapped using the corners. See "Face color determination" under Notes at the bottom for the method.
+function mapColorsFromCorners() {
+	
+	//Get the rear bottom left corner's colors, use these as the first colors (left, bottom, rear) in faceColors
+	faceColors[1] = cubeArray[0][0][0].material[1].color.getHex();		//Left face color
+	faceColors[3] = cubeArray[0][0][0].material[3].color.getHex();		//Bottom face color
+	faceColors[5] = cubeArray[0][0][0].material[5].color.getHex();		//Rear face color
+
+	//Gets the number of colors on the front bottom left corner which match those on the rear bottom left corner.
+	const colorMatches = cornerColorMatches(cubeArray[0][0][cubeSize - 1], [1, 3, 4]);
+	
+	if (colorMatches.length == 0) {
+		
+		//Get the colors from the rear top left corner and use this to link the previous two corners to map out all 6 colors
+		mapOppositeCorners(cubeArray[0][0][cubeSize - 1], [1, 3, 4], cubeArray[0][cubeSize - 1][0], [1, 2, 5]);
+		
+	} else if (colorMatches.length == 1) {
+		
+		//Maps the matched color
+		
+	} else if (colorMatches.length == 2) {
+		
+		//Maps the matched colors
+		
+		
+	} else {			//Something went wrong, throw an error alert
+		
+		alert("Error: Invalid number of color matches from cornerColorMatches: " + colorMatches.length + " matches. Expected: 0 - 2.");
+		
+	}
+	
+}
+
+
+//Returns the number of colors on the specified cube corner that match colors currently in faceColors
+function cornerColorMatches(cornerCube, faceIndices) {
+	
+	//Stores the color matches (should be between 0 and 3 matches, inclusive)
+	var colorMatches = [];
+	
+	//Loops through each color in faceColors and checks if it matches to any of the colors on the corner piece
+	//If so, adds one to colorMatches and moves to the next color in faceColors
+	for (var faceColorIndex = 0; faceColorIndex < faceColors.length; faceColorIndex++) {
+		
+		for (var cornerColorIndex = 0; cornerColorIndex < 3; cornerColorIndex++) {
+			
+			if (cornerCube.material[faceIndices[cornerColorIndex]].color.getHex() == faceColors[faceColorIndex]) {
+				
+				colorMatches.push(faceColors[faceColorIndex]);
+				break;
+				
+			}
+			
+		}
+		
+	}
+	
+	return colorMatches;
+
+}
+
+//Takes two opposite corners (no matching colors) and uses a third corner to link them so we can determine their relative orientations.
+//Finishes mapping faceColors
+function mapOppositeCorners(oppCorner, oppCornerFaces, linkCorner, linkCornerFaces) {
+	
+	//Gets the number of colors on the rear top left corner which match those on the rear bottom left corner.
+	const colorMatchesLinker = cornerColorMatches(linkCorner, linkCornerFaces);
+	
+	if (colorMatchesLinker.length == 1) {				//One color matches to the rear bottom left corner, the other two match to the opposite corner
+		
+		//Determine which face the linker cube matches to
+		var linkerMatchFace = 0;
+		
+		for (linkerMatchFace; linkerMatchFace < 6; linkerMatchFace++) {
+			
+			if (colorMatchesLinker[0] == faceColorIndex[linkerMatchFace]) {
+				
+				break;
+				
+			}
+			
+		}
+		
+		//Map the other two positions based on the linker cube
+		
+		//Fill in the final color based on the missing color from the opposite corner cube
+		
+		
+	} else if (colorMatchesLinker.length == 2) {		//Two colors match to the rear bottom left corner, the other one matches to the opposite corner
+		
+		
+		
+	} else {			//Something went wrong, throw an error alert
+			
+		alert("Error: Invalid number of color matches from cornerColorMatches in mapOppositeCorners: " + colorMatchesLinker.length + " matches. Expected: 1 or 2.");
+		
+	}
 	
 }
 
@@ -1039,6 +1185,12 @@ window.testJS = function() {
 /*********** NOTES
 
 To dos:
+Figure out how to handle this problem: faces are indexed 0-5. But they can face different directions, so face 0 won't always be pointing in the same directions
+	-Also, think about what happens when analyzing a cube. You will dynamcially assign colors to meshes. So you can't necessarily rely on face indices in certain directions.
+	-And, inner colors should be black, so when animating cube turns, you don't get colors popping up from the inside.
+	-To handle this, we may want to redo to meshing colors and recolor as you go?
+
+
 Navigate around different cube views (in both isometric mode and square mode)
 	Make nav cube a truncated cube and just click to snap to different square and isometric views on the nav cube
 		Make truncated cube
@@ -1083,6 +1235,43 @@ Algorithm Notation:
 OrbitControls
 	A nice video here on how to implement it: https://www.youtube.com/watch?v=4ZgkMS5rH3E
 	This allows for very easy implementation of controls like rotating the camera with touch or left click, panning with right click, and zooming in and out with the mouse wheel
+
+Determining a piece's outer face(s)
+	First, note that the plane of each face is at either a max or min value for one of the axes:
+		Right face: maximum X
+		Left face: minimum X
+		Top face: maximum Y
+		Bottom face: minimum Y
+		Front face: maximum Z
+		Rear face: minimum Z
+	There are 3 different types of pieces:
+		Corner pieces:
+			These are at the intersection of 3 planes. Therefore, their coordinates are comprised entirely of maxima/minima.
+			These pieces have 3 outer faces.
+		Edge pieces:
+			These are at the intersection of 2 planes. Therefore, their coordinates are comprised of 2 maxima/minima and 1 non maxima/minima.
+			These pieces have 2 outer faces.
+		Face pieces:
+			These are only within 1 plane. Therefore, their coordinates are comprised of 1 maxima/minima and 2 non maxima/minima.
+			These pieces have 1 outer face.
+
+Face color determination
+	Obviously, if the face centers are fixed, as they are in cubes with odd numbered sides (3x3, 5x5, etc.), then this is easy.
+	For cubes with non-fixed centers, we need to use the corners to determine the relative face color positions.
+		Starting with the rear bottom left corner, we can get 3 relative positions.
+			The next corner selected will fall into one of three categories:
+				Opposite corner (0 color matches, 3 different colors).
+					We cannot do anything with this yet, since we don't know their positions relative to the ones we already know.
+					But by selecting one more corner, we can link the two and be done with the color mapping.
+				Intermediate corner (1 color match, 2 different colors).
+					We can map the 2 new color positions.
+					Now we just need to find a corner with the one missing color and map it to the last remaining position.
+				Near corner (2 color matches, a different color).
+					We can map the 1 new color position.
+					We must continue to map the other 2 colors:
+						Of the 6 remaining corners, 2 have both unmapped colors, 2 have only one of the unmapped colors, and 2 only have the other unmapped color.
+						If we pick either of the 2 with both unmapped colors, we're done.'
+						If we pick one with only one unmapped color, we must pick until we've found the other unmapped color (max 2 more corners).
 	
 piecePositions array
 	Stores the solved position of the piece in the specified position.
