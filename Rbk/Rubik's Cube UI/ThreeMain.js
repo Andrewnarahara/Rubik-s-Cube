@@ -34,6 +34,14 @@ const faceNames = ["Right", "Left", "Top", "Bottom", "Front", "Rear"];
 //Stores the colors of each face (same order as faceNames)
 var faceColors = [];
 
+//Stores normal vectors for the 6 principal directions to help determine colors of outer faces
+const leftDirection = new THREE.Vector3(-1, 0, 0);
+const rightDirection = new THREE.Vector3(1, 0, 0);
+const upDirection = new THREE.Vector3(0, 1, 0);
+const downDirection = new THREE.Vector3(0, -1, 0);
+const frontDirection = new THREE.Vector3(0, 0, 1);
+const rearDirection = new THREE.Vector3(0, 0, -1);
+
 //Keeps track of which face is highlighted. No face = -1
 var highlightedFace = -1;
 
@@ -1034,12 +1042,31 @@ function defineCubeFormat() {
 		
 		alert(faceColors.length);
 		
+		
+		
+		//get piece position, figure out what directions outside face(s) are pointing
+		//Figure out which axes of the cube are poitning in those directions
+		//Translate those axes to face indices
+		//Get colors from the face indices
+	
+	
+	
+		var axesDir = cubeArray[0][0][0].matrixWorld.elements;
+
+		alert("x axis dir: " + Math.round(axesDir[0]) + ", " + Math.round(axesDir[1]) + ", " + Math.round(axesDir[2]));
+
+		
+	
+		//getFaceIndexWithDirection(cubeArray[0][0][0], leftDirection);
+		
+	
+	
 		//Map the colors to faceColors
-		mapColorsFromCorners()
+		//mapColorsFromCorners()
 		
 	}
 	
-	alert(faceColors);
+	//alert(faceColors);
 	
 }
 
@@ -1076,6 +1103,40 @@ function mapColorsFromCorners() {
 	
 }
 
+//Returns the index of the face on the cube facing the specificed direction
+function getFaceIndexWithDirection(cubeObject, theDirection) {
+	
+	//For storing the current triangle
+	const tri = new THREE.Triangle(); // for re-use
+	const indices = new THREE.Vector3(); // for re-use
+	const outNormal = new THREE.Vector3(); // this is the output normal you need
+
+	for(let f = 0; f < 12; f++){
+			
+		indices.fromArray(cubeObject.geometry.index.array, f * 3);
+
+		tri.setFromAttributeAndIndices(cubeObject.geometry.attributes.position,
+			indices.x,
+			indices.y,
+			indices.z);
+			
+		tri.getNormal(outNormal);
+		
+		alert("(" + outNormal.x + ", " + outNormal.y + ", " + outNormal.z + "), (" + theDirection.x + ", " + theDirection.y + ", " + theDirection.z + ")");
+		
+		if(outNormal.equals(theDirection)) {
+			
+			alert(Math.round((f - 0.5) / 2));
+			alert(cubeObject.rotation.y + ", " + cubeObject.position.x + ", " + cubeObject.position.z);
+			return;
+			
+		}
+
+	}
+	
+	alert("no match found");
+	
+}
 
 //Returns the number of colors on the specified cube corner that match colors currently in faceColors
 function cornerColorMatches(cornerCube, faceIndices) {
