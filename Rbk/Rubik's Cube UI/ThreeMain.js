@@ -1042,21 +1042,7 @@ function defineCubeFormat() {
 		
 		alert(faceColors.length);
 		
-		
-		
-		//get piece position, figure out what directions outside face(s) are pointing
-		//Figure out which axes of the cube are poitning in those directions
-		//Translate those axes to face indices
-		//Get colors from the face indices
-	
-	
-	
-		var axesDir = cubeArray[0][0][0].matrixWorld.elements;
 
-		alert("x axis dir: " + Math.round(axesDir[0]) + ", " + Math.round(axesDir[1]) + ", " + Math.round(axesDir[2]));
-
-		
-	
 		//getFaceIndexWithDirection(cubeArray[0][0][0], leftDirection);
 		
 	
@@ -1072,6 +1058,30 @@ function defineCubeFormat() {
 
 //Fills out faceColors with the appropriate colors mapped using the corners. See "Face color determination" under Notes at the bottom for the method.
 function mapColorsFromCorners() {
+	
+	
+	
+			
+		
+		//get piece position, figure out what directions outside face(s) are pointing
+		//Figure out which axes of the cube are poitning in those directions
+		//Translate those axes to face indices
+		//Get colors from the face indices
+	
+	
+	
+		//var axesDir = cubeArray[0][0][0].matrixWorld.elements;
+		//alert("x axis dir: " + Math.round(axesDir[0]) + ", " + Math.round(axesDir[1]) + ", " + Math.round(axesDir[2]));
+		// if (vector3One.equals(vector3two)) {
+			
+			
+		// }
+		
+	
+	
+	
+	
+	
 	
 	//Get the rear bottom left corner's colors, use these as the first colors (left, bottom, rear) in faceColors
 	faceColors[1] = cubeArray[0][0][0].material[1].color.getHex();		//Left face color
@@ -1100,41 +1110,6 @@ function mapColorsFromCorners() {
 		alert("Error: Invalid number of color matches from cornerColorMatches: " + colorMatches.length + " matches. Expected: 0 - 2.");
 		
 	}
-	
-}
-
-//Returns the index of the face on the cube facing the specificed direction
-function getFaceIndexWithDirection(cubeObject, theDirection) {
-	
-	//For storing the current triangle
-	const tri = new THREE.Triangle(); // for re-use
-	const indices = new THREE.Vector3(); // for re-use
-	const outNormal = new THREE.Vector3(); // this is the output normal you need
-
-	for(let f = 0; f < 12; f++){
-			
-		indices.fromArray(cubeObject.geometry.index.array, f * 3);
-
-		tri.setFromAttributeAndIndices(cubeObject.geometry.attributes.position,
-			indices.x,
-			indices.y,
-			indices.z);
-			
-		tri.getNormal(outNormal);
-		
-		alert("(" + outNormal.x + ", " + outNormal.y + ", " + outNormal.z + "), (" + theDirection.x + ", " + theDirection.y + ", " + theDirection.z + ")");
-		
-		if(outNormal.equals(theDirection)) {
-			
-			alert(Math.round((f - 0.5) / 2));
-			alert(cubeObject.rotation.y + ", " + cubeObject.position.x + ", " + cubeObject.position.z);
-			return;
-			
-		}
-
-	}
-	
-	alert("no match found");
 	
 }
 
