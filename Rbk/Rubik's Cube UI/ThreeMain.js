@@ -1017,7 +1017,10 @@ function getPiecePositions() {
 //For cubes with fixed centers (3x3, 5x5, 7x7, etc.) this is much easier, but for cubes like 4x4 and 6x6, we must determine this based on the corners
 //Fills out this format in faceColors, a 1D array with the face order Right, Left, Top, Bottom, Front, Rear
 function defineCubeFormat() {
-		
+	
+	//Resets faceColors in case a new cube has been put in
+	faceColors = [];
+	
 	//Stores important indexes in cubeArray
 	const cubeIndexMiddle = (cubeSize - 1) / 2;
 	const cubeIndexMax = cubeSize - 1;
@@ -1041,14 +1044,9 @@ function defineCubeFormat() {
 		}
 		
 		alert(faceColors.length);
-		
-
-		//getFaceIndexWithDirection(cubeArray[0][0][0], leftDirection);
-		
-	
 	
 		//Map the colors to faceColors
-		//mapColorsFromCorners()
+		mapColorsFromCorners()
 		
 	}
 	
@@ -1058,35 +1056,20 @@ function defineCubeFormat() {
 
 //Fills out faceColors with the appropriate colors mapped using the corners. See "Face color determination" under Notes at the bottom for the method.
 function mapColorsFromCorners() {
-	
-	
-	
-			
 		
-		//get piece position, figure out what directions outside face(s) are pointing
-		//Figure out which axes of the cube are poitning in those directions
-		//Translate those axes to face indices
-		//Get colors from the face indices
+	//Get the face directions for cubeArray piece [0, 0, 0]
+	var outsideFaceDirections = getOutsideFaceDirections([0, 0, 0]);
+	
+	//Gets the axes indices of the outside faces
+	var outsideFaceIndices = getOutsideFaceAxes([0, 0, 0], outsideFaceDirections);
+				
+	//Get colors from the face indices and maps them in faceColors. We will assume this cube's position marks the solved position
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[0][1])] = cubeArray[0][0][0].material[outsideFaceIndices[0][0]].color.getHex();
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[1][1])] = cubeArray[0][0][0].material[outsideFaceIndices[1][0]].color.getHex();
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[2][1])] = cubeArray[0][0][0].material[outsideFaceIndices[2][0]].color.getHex();	
 	
 	
-	
-		//var axesDir = cubeArray[0][0][0].matrixWorld.elements;
-		//alert("x axis dir: " + Math.round(axesDir[0]) + ", " + Math.round(axesDir[1]) + ", " + Math.round(axesDir[2]));
-		// if (vector3One.equals(vector3two)) {
-			
-			
-		// }
-		
-	
-	
-	
-	
-	
-	
-	//Get the rear bottom left corner's colors, use these as the first colors (left, bottom, rear) in faceColors
-	faceColors[1] = cubeArray[0][0][0].material[1].color.getHex();		//Left face color
-	faceColors[3] = cubeArray[0][0][0].material[3].color.getHex();		//Bottom face color
-	faceColors[5] = cubeArray[0][0][0].material[5].color.getHex();		//Rear face color
+	/*
 
 	//Gets the number of colors on the front bottom left corner which match those on the rear bottom left corner.
 	const colorMatches = cornerColorMatches(cubeArray[0][0][cubeSize - 1], [1, 3, 4]);
@@ -1109,6 +1092,131 @@ function mapColorsFromCorners() {
 		
 		alert("Error: Invalid number of color matches from cornerColorMatches: " + colorMatches.length + " matches. Expected: 0 - 2.");
 		
+	}
+	*/
+}
+
+//Returns an array of Vector3 objects with the directions of the outside faces of the specified piece
+function getOutsideFaceDirections(cubeArrayIndices) {
+	
+	//The maximum index of a piece on the cube
+	const cubeIndexMax = cubeSize - 1;
+	
+	//Stores the directions of the outside faces
+	var outsideFaceDirections = [];
+	
+	//Checks if the x location of the piece puts it on either the left or right face of the cube
+	if (cubeArrayIndices[0] == 0) {
+		
+		outsideFaceDirections.push(leftDirection);
+		
+	} else if (cubeArrayIndices[0] == cubeIndexMax) {
+		
+		outsideFaceDirections.push(rightDirection);
+		
+	}
+	
+	//Checks if the y location of the piece puts it on either the top or bottom face of the cube
+	if (cubeArrayIndices[1] == 0) {
+		
+		outsideFaceDirections.push(downDirection);
+		
+	} else if (cubeArrayIndices[1] == cubeIndexMax) {
+		
+		outsideFaceDirections.push(upDirection);
+		
+	}
+	
+	//Checks if the z location of the piece puts it on either the front or rear face of the cube
+	if (cubeArrayIndices[2] == 0) {
+		
+		outsideFaceDirections.push(rearDirection);
+		
+	} else if (cubeArrayIndices[2] == cubeIndexMax) {
+		
+		outsideFaceDirections.push(frontDirection);
+		
+	}
+	
+	return outsideFaceDirections;
+	
+}
+
+//Returns the axis indices of the outside faces of the specified cube piece
+function getOutsideFaceAxes(cubeArrayIndices, outsideFaceDirections) {
+	
+	//Gets the axis directions of the piece
+	var axesDir = cubeArray[cubeArrayIndices[0]][cubeArrayIndices[1]][cubeArrayIndices[2]].matrixWorld.elements;
+	
+	//Sometimes the axes directions can be off by very small amounts, so we round to the nearest whole number
+	for (var i = 0; i < 11; i++) {
+		
+		if ((i + 1) % 4 != 0) {			//Skips over every 4th element, since only the first 3 of every 4 are the axis directions
+			
+			axesDir[i] = Math.round(axesDir[i]);
+			
+		}
+		
+	}
+	
+	//Stores the world directions of all 6 faces of the piece
+	const faceDirections = [new THREE.Vector3(axesDir[0], axesDir[1], axesDir[2]),							//Right face (index 0)
+							new THREE.Vector3(-1 * axesDir[0], -1 * axesDir[1], -1 * axesDir[2]),			//Left face (index 1)
+							new THREE.Vector3(axesDir[4], axesDir[5], axesDir[6]),							//Top face (index 2)
+							new THREE.Vector3(-1 * axesDir[4], -1 * axesDir[5], -1 * axesDir[6]),			//Bottom face (index 3)
+							new THREE.Vector3(axesDir[8], axesDir[9], axesDir[10]),							//Front face (index 4)
+							new THREE.Vector3(-1 * axesDir[8], -1 * axesDir[9], -1 * axesDir[10])];			//Rear face (index 5)
+	
+	//Stores the face indices facing outside and their world directions
+	var outsideFaceIndices = [];
+	
+	//Checks if each face index is facing outside
+	for (var i = 0; i < faceDirections.length; i++) {
+		
+		for (var j = 0; j < outsideFaceDirections.length; j++) {
+			
+			//If the world direction of the piece's face with the current index matches one of the outside face directions of the piece, push the index to outsideFaceIndices and move to the next index
+			if (faceDirections[i].equals(outsideFaceDirections[j])) {
+				
+				outsideFaceIndices.push([i, outsideFaceDirections[j]]);
+				break;
+				
+			}
+			
+		}
+		
+	}
+	
+	return outsideFaceIndices;
+	
+}
+
+//Converts a direction (Vector3) to an index according to faceNames' convention
+function getWorldIndexFromDirection(theDirection) {
+	
+	switch(theDirection) {
+		case rightDirection:
+			return 0;
+		
+		case leftDirection:
+			return 1;
+		
+		case upDirection:
+			return 2;
+		
+		case downDirection:
+			return 3;
+		
+		case frontDirection:
+			return 4;
+		
+		case rearDirection:
+			return 5;
+		
+		default:
+			alert("Error: Invalid direction: (" + theDirection.x + ", " + theDirection.y + ", " + theDirection.z + ")");
+			return -1;
+	
 	}
 	
 }
@@ -1239,6 +1347,12 @@ Cube solving functions
 Animate cube motions
 Analyze cube with camera, get piece positions
 Change the way cubeArray is handled to have it reflect the current piece positions?
+
+For larger cubes:
+-How to turn cube at non-edge/face places (mouseover clicks on cube? dynamic controls?)
+-How to handle solve positions (array of possible solved locations?)
+
+Working with non-cube puzzles
 
 
 
