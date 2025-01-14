@@ -1042,15 +1042,13 @@ function defineCubeFormat() {
 			faceColors.push(-1);
 			
 		}
-		
-		alert(faceColors.length);
-	
+			
 		//Map the colors to faceColors
 		mapColorsFromCorners()
 		
 	}
 	
-	//alert(faceColors);
+	alert(faceColors);
 	
 }
 
@@ -1068,6 +1066,10 @@ function mapColorsFromCorners() {
 	faceColors[getWorldIndexFromDirection(outsideFaceIndices[1][1])] = cubeArray[0][0][0].material[outsideFaceIndices[1][0]].color.getHex();
 	faceColors[getWorldIndexFromDirection(outsideFaceIndices[2][1])] = cubeArray[0][0][0].material[outsideFaceIndices[2][0]].color.getHex();	
 	
+	//Gets the face colors from cubeArray piece [0, 0, cubeSize - 1] (another corner piece)
+	
+	
+	pieceColorMatches([0, 0, 0], [0, 0, cubeSize - 1]);
 	
 	/*
 
@@ -1221,11 +1223,39 @@ function getWorldIndexFromDirection(theDirection) {
 	
 }
 
-//Returns the number of colors on the specified cube corner that match colors currently in faceColors
-function cornerColorMatches(cornerCube, faceIndices) {
+//Takes in two sets of cubeArray indices. Returns a 2D array of the matching colored faces between them
+function pieceColorMatches(cubeOneIndices, cubeTwoIndices) {
 	
 	//Stores the color matches (should be between 0 and 3 matches, inclusive)
 	var colorMatches = [];
+	
+	//Get the face directions for the cubeArray pieces
+	const outsideFaceDirectionsOne = getOutsideFaceDirections(cubeOneIndices);
+	const outsideFaceDirectionsTwo = getOutsideFaceDirections(cubeTwoIndices);
+	
+	//Gets the axes indices of the outside faces
+	const outsideFaceIndicesOne = getOutsideFaceAxes(cubeOneIndices, outsideFaceDirectionsOne);
+	const outsideFaceIndicesTwo = getOutsideFaceAxes(cubeTwoIndices, outsideFaceDirectionsTwo);
+	
+	alert(outsideFaceDirectionsOne.length + ", " + outsideFaceDirectionsTwo.length);
+	/*
+	//Loop and check for color matches between all faces
+	for (var cubeOneFaceIndex = 0; cubeOneFaceIndex < outsideFaceDirectionsOne.length; cubeOneFaceIndex++) {
+		
+		for (var cubeTwoFaceIndex = 0; cubeTwoFaceIndex < outsideFaceDirectionsTwo.length; cubeTwoFaceIndex++) {
+		
+			if () {					//If colors match, add indices of cubeOne and cubeTwo to colorMatches
+				
+				
+				
+			}
+		
+		}
+		
+	}
+	*/
+	
+	/*
 	
 	//Loops through each color in faceColors and checks if it matches to any of the colors on the corner piece
 	//If so, adds one to colorMatches and moves to the next color in faceColors
@@ -1243,6 +1273,8 @@ function cornerColorMatches(cornerCube, faceIndices) {
 		}
 		
 	}
+	
+	*/
 	
 	return colorMatches;
 
