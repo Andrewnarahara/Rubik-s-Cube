@@ -1262,11 +1262,13 @@ function mapOppositeCorners(cubeOneIndices, cubeTwoIndices, linkPieceIndices) {
 	//Get the face directions for the cubeArray pieces
 	const outsideFaceDirectionsOne = getOutsideFaceDirections(cubeOneIndices);
 	const outsideFaceDirectionsTwo = getOutsideFaceDirections(cubeTwoIndices);
+	const outsideFaceDirectionsLink = getOutsideFaceDirections(linkPieceIndices);
+
 	
 	//Gets the axes indices of the outside faces
 	const outsideFaceIndicesOne = getOutsideFaceAxes(cubeOneIndices, outsideFaceDirectionsOne);
 	const outsideFaceIndicesTwo = getOutsideFaceAxes(cubeTwoIndices, outsideFaceDirectionsTwo);
-	
+	const outsideFaceIndicesLink = getOutsideFaceAxes(linkPieceIndices, outsideFaceDirectionsLink);
 	
 	
 	
