@@ -1066,15 +1066,9 @@ function mapColorsFromCorners() {
 	faceColors[getWorldIndexFromDirection(outsideFaceIndices[1][1])] = cubeArray[0][0][0].material[outsideFaceIndices[1][0]].color.getHex();
 	faceColors[getWorldIndexFromDirection(outsideFaceIndices[2][1])] = cubeArray[0][0][0].material[outsideFaceIndices[2][0]].color.getHex();	
 	
-	//Gets the face colors from cubeArray piece [0, 0, cubeSize - 1] (another corner piece)
+	//Gets the indices of the faces whose colors match between cubeArray piece [0, 0, 0] and cubeArray piece [0, 0, cubeSize - 1] (another corner piece)
+	const colorMatches = pieceColorMatches([0, 0, 0], [0, 0, cubeSize - 1]);
 	
-	
-	pieceColorMatches([0, 0, 0], [0, 0, cubeSize - 1]);
-	
-	/*
-
-	//Gets the number of colors on the front bottom left corner which match those on the rear bottom left corner.
-	const colorMatches = cornerColorMatches(cubeArray[0][0][cubeSize - 1], [1, 3, 4]);
 	
 	if (colorMatches.length == 0) {
 		
@@ -1092,10 +1086,10 @@ function mapColorsFromCorners() {
 		
 	} else {			//Something went wrong, throw an error alert
 		
-		alert("Error: Invalid number of color matches from cornerColorMatches: " + colorMatches.length + " matches. Expected: 0 - 2.");
+		alert("Error: Invalid number of color matches from pieceColorMatches: " + colorMatches.length + " matches. Expected: 0 - 2.");
 		
 	}
-	*/
+
 }
 
 //Returns an array of Vector3 objects with the directions of the outside faces of the specified piece
@@ -1145,6 +1139,7 @@ function getOutsideFaceDirections(cubeArrayIndices) {
 }
 
 //Returns the axis indices of the outside faces of the specified cube piece
+//Return array is of the format: [[world direction index (right = 0, left = 1, ...), local piece face index], ...]
 function getOutsideFaceAxes(cubeArrayIndices, outsideFaceDirections) {
 	
 	//Gets the axis directions of the piece
@@ -1237,45 +1232,24 @@ function pieceColorMatches(cubeOneIndices, cubeTwoIndices) {
 	const outsideFaceIndicesOne = getOutsideFaceAxes(cubeOneIndices, outsideFaceDirectionsOne);
 	const outsideFaceIndicesTwo = getOutsideFaceAxes(cubeTwoIndices, outsideFaceDirectionsTwo);
 	
-	alert(outsideFaceDirectionsOne.length + ", " + outsideFaceDirectionsTwo.length);
-	/*
 	//Loop and check for color matches between all faces
 	for (var cubeOneFaceIndex = 0; cubeOneFaceIndex < outsideFaceDirectionsOne.length; cubeOneFaceIndex++) {
 		
 		for (var cubeTwoFaceIndex = 0; cubeTwoFaceIndex < outsideFaceDirectionsTwo.length; cubeTwoFaceIndex++) {
 		
-			if () {					//If colors match, add indices of cubeOne and cubeTwo to colorMatches
+			var colorOne = cubeArray[cubeOneIndices[0]][cubeOneIndices[1]][cubeOneIndices[2]].material[outsideFaceIndicesOne[cubeOneFaceIndex][0]].color.getHex();
+			var colorTwo = cubeArray[cubeTwoIndices[0]][cubeTwoIndices[1]][cubeTwoIndices[2]].material[outsideFaceIndicesTwo[cubeTwoFaceIndex][0]].color.getHex();
+
+			if (colorOne == colorTwo) {					//If colors match, add indices of cubeOne and cubeTwo to colorMatches
 				
-				
+				colorMatches.push([outsideFaceIndicesOne[cubeOneFaceIndex][0], outsideFaceIndicesTwo[cubeTwoFaceIndex][0]]);
 				
 			}
 		
 		}
 		
 	}
-	*/
-	
-	/*
-	
-	//Loops through each color in faceColors and checks if it matches to any of the colors on the corner piece
-	//If so, adds one to colorMatches and moves to the next color in faceColors
-	for (var faceColorIndex = 0; faceColorIndex < faceColors.length; faceColorIndex++) {
-		
-		for (var cornerColorIndex = 0; cornerColorIndex < 3; cornerColorIndex++) {
-			
-			if (cornerCube.material[faceIndices[cornerColorIndex]].color.getHex() == faceColors[faceColorIndex]) {
-				
-				colorMatches.push(faceColors[faceColorIndex]);
-				break;
-				
-			}
-			
-		}
-		
-	}
-	
-	*/
-	
+
 	return colorMatches;
 
 }
