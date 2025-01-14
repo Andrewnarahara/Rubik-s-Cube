@@ -1069,10 +1069,10 @@ function mapColorsFromCorners() {
 	//Gets the indices of the faces whose colors match between cubeArray piece [0, 0, 0] and cubeArray piece [0, 0, cubeSize - 1] (another corner piece)
 	const colorMatches = pieceColorMatches([0, 0, 0], [0, 0, cubeSize - 1]);
 	
-	
+	//Handles the rest of the color mapping based on the number of colors matches between the two corner pieces
 	if (colorMatches.length == 0) {
 		
-		//Get the colors from the rear top left corner and use this to link the previous two corners to map out all 6 colors
+		//Get the colors from another corner piece (cubeArray piece [0, cubeSize - 1, 0]) and use this to link the previous two corners to map out all 6 colors
 		mapOppositeCorners(cubeArray[0][0][cubeSize - 1], [1, 3, 4], cubeArray[0][cubeSize - 1][0], [1, 2, 5]);
 		
 	} else if (colorMatches.length == 1) {
@@ -1092,7 +1092,7 @@ function mapColorsFromCorners() {
 
 }
 
-//Returns an array of Vector3 objects with the directions of the outside faces of the specified piece
+//Returns an array of Vector3 objects with the world directions of the outside faces of the specified piece
 function getOutsideFaceDirections(cubeArrayIndices) {
 	
 	//The maximum index of a piece on the cube
@@ -1256,8 +1256,21 @@ function pieceColorMatches(cubeOneIndices, cubeTwoIndices) {
 
 //Takes two opposite corners (no matching colors) and uses a third corner to link them so we can determine their relative orientations.
 //Finishes mapping faceColors
-function mapOppositeCorners(oppCorner, oppCornerFaces, linkCorner, linkCornerFaces) {
+//Some functions (like searching for outside faces) are repeated from earier. I know this is not memory efficient but memory isn't a huge concern for this application so I'll let it slide
+function mapOppositeCorners(cubeOneIndices, cubeTwoIndices, linkPieceIndices) {
 	
+	//Get the face directions for the cubeArray pieces
+	const outsideFaceDirectionsOne = getOutsideFaceDirections(cubeOneIndices);
+	const outsideFaceDirectionsTwo = getOutsideFaceDirections(cubeTwoIndices);
+	
+	//Gets the axes indices of the outside faces
+	const outsideFaceIndicesOne = getOutsideFaceAxes(cubeOneIndices, outsideFaceDirectionsOne);
+	const outsideFaceIndicesTwo = getOutsideFaceAxes(cubeTwoIndices, outsideFaceDirectionsTwo);
+	
+	
+	
+	
+	/*
 	//Gets the number of colors on the rear top left corner which match those on the rear bottom left corner.
 	const colorMatchesLinker = cornerColorMatches(linkCorner, linkCornerFaces);
 	
@@ -1290,7 +1303,7 @@ function mapOppositeCorners(oppCorner, oppCornerFaces, linkCorner, linkCornerFac
 		alert("Error: Invalid number of color matches from cornerColorMatches in mapOppositeCorners: " + colorMatchesLinker.length + " matches. Expected: 1 or 2.");
 		
 	}
-	
+	*/
 }
 
 //Returns the solved position of the piece in cubeArray to be stored in piecePositions
