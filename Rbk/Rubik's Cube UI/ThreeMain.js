@@ -1027,12 +1027,12 @@ function defineCubeFormat() {
 		
 	if (cubeSize % 2 == 1) {		//Use centers to determine format
 		
-		faceColors.push(cubeArray[cubeIndexMax][cubeIndexMiddle][cubeIndexMiddle].material[0].color.getHex());		//Right face color
-		faceColors.push(cubeArray[0][cubeIndexMiddle][cubeIndexMiddle].material[1].color.getHex());					//Left face color
-		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMax][cubeIndexMiddle].material[2].color.getHex());		//Top face color
-		faceColors.push(cubeArray[cubeIndexMiddle][0][cubeIndexMiddle].material[3].color.getHex());					//Bottom face color
-		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMiddle][cubeIndexMax].material[4].color.getHex());		//Front face color
-		faceColors.push(cubeArray[cubeIndexMiddle][cubeIndexMiddle][0].material[5].color.getHex());					//Rear face color
+		faceColors.push(getFaceColor([cubeIndexMax, cubeIndexMiddle, cubeIndexMiddle], 0));		//Right face color
+		faceColors.push(getFaceColor([0, cubeIndexMiddle, cubeIndexMiddle], 1));				//Left face color
+		faceColors.push(getFaceColor([cubeIndexMiddle, cubeIndexMax, cubeIndexMiddle], 2));		//Top face color
+		faceColors.push(getFaceColor([cubeIndexMiddle, 0, cubeIndexMiddle], 3));				//Bottom face color
+		faceColors.push(getFaceColor([cubeIndexMiddle, cubeIndexMiddle, cubeIndexMax], 4));		//Front face color
+		faceColors.push(getFaceColor([cubeIndexMiddle, cubeIndexMiddle, 0], 5));				//Rear face color
 
 	} else {						//Use corners to determine format.
 		
@@ -1052,6 +1052,13 @@ function defineCubeFormat() {
 	
 }
 
+//Gets the color of the specified local face index of the specified cube piece
+function getFaceColor(cubeIndices, faceIndex) {
+	
+	return cubeArray[cubeIndices[0]][cubeIndices[1]][cubeIndices[2]].material[faceIndex].color.getHex();
+	
+}
+
 //Fills out faceColors with the appropriate colors mapped using the corners. See "Face color determination" under Notes at the bottom for the method.
 function mapColorsFromCorners() {
 		
@@ -1062,9 +1069,9 @@ function mapColorsFromCorners() {
 	var outsideFaceIndices = getOutsideFaceAxes([0, 0, 0], outsideFaceDirections);
 				
 	//Get colors from the face indices and maps them in faceColors. We will assume this cube's position marks the solved position
-	faceColors[getWorldIndexFromDirection(outsideFaceIndices[0][1])] = cubeArray[0][0][0].material[outsideFaceIndices[0][0]].color.getHex();
-	faceColors[getWorldIndexFromDirection(outsideFaceIndices[1][1])] = cubeArray[0][0][0].material[outsideFaceIndices[1][0]].color.getHex();
-	faceColors[getWorldIndexFromDirection(outsideFaceIndices[2][1])] = cubeArray[0][0][0].material[outsideFaceIndices[2][0]].color.getHex();	
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[0][1])] = getFaceColor([0, 0, 0], outsideFaceIndices[0][0]);
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[1][1])] = getFaceColor([0, 0, 0], outsideFaceIndices[1][0]);
+	faceColors[getWorldIndexFromDirection(outsideFaceIndices[2][1])] = getFaceColor([0, 0, 0], outsideFaceIndices[2][0]);
 	
 	//Gets the indices of the faces whose colors match between cubeArray piece [0, 0, 0] and cubeArray piece [0, 0, cubeSize - 1] (another corner piece)
 	const colorMatches = pieceColorMatches([0, 0, 0], [0, 0, cubeSize - 1]);
@@ -1237,8 +1244,8 @@ function pieceColorMatches(cubeOneIndices, cubeTwoIndices) {
 		
 		for (var cubeTwoFaceIndex = 0; cubeTwoFaceIndex < outsideFaceDirectionsTwo.length; cubeTwoFaceIndex++) {
 		
-			var colorOne = cubeArray[cubeOneIndices[0]][cubeOneIndices[1]][cubeOneIndices[2]].material[outsideFaceIndicesOne[cubeOneFaceIndex][0]].color.getHex();
-			var colorTwo = cubeArray[cubeTwoIndices[0]][cubeTwoIndices[1]][cubeTwoIndices[2]].material[outsideFaceIndicesTwo[cubeTwoFaceIndex][0]].color.getHex();
+			var colorOne = getFaceColor(cubeOneIndices, outsideFaceIndicesOne[cubeOneFaceIndex][0]);
+			var colorTwo = getFaceColor(cubeTwoIndices, outsideFaceIndicesTwo[cubeTwoFaceIndex][0]);
 
 			if (colorOne == colorTwo) {					//If colors match, add indices of cubeOne and cubeTwo to colorMatches
 				
@@ -1270,42 +1277,46 @@ function mapOppositeCorners(cubeOneIndices, cubeTwoIndices, linkPieceIndices) {
 	const outsideFaceIndicesTwo = getOutsideFaceAxes(cubeTwoIndices, outsideFaceDirectionsTwo);
 	const outsideFaceIndicesLink = getOutsideFaceAxes(linkPieceIndices, outsideFaceDirectionsLink);
 	
+	//Find the matching face(s) between the first piece and the link piece. There should only be one or two matches
+	var colorMatches = pieceColorMatches(cubeOneIndices, linkPieceIndices);
 	
-	
-	/*
-	//Gets the number of colors on the rear top left corner which match those on the rear bottom left corner.
-	const colorMatchesLinker = cornerColorMatches(linkCorner, linkCornerFaces);
-	
-	if (colorMatchesLinker.length == 1) {				//One color matches to the rear bottom left corner, the other two match to the opposite corner
+	if (colorMatches.length == 1) {			//We know that the link piece should be in the corner opposite the first piece along the matching face
 		
-		//Determine which face the linker cube matches to
-		var linkerMatchFace = 0;
 		
-		for (linkerMatchFace; linkerMatchFace < 6; linkerMatchFace++) {
+		
+	} else if (colorMatches.length == 2) {		//We know that the non-matched color on the link piece should be on the face opposite the non-matched color on the first piece
+		
+		//The matched colors
+		const colorMatchOne = getFaceColor(cubeOneIndices, colorMatches[0][0]);
+		const colorMatchTwo = getFaceColor(cubeOneIndices, colorMatches[1][0]);
+		
+		var linkPieceOutsideFaceColor;
+		
+		//Get non-matched color on the link piece
+		for (var i = 0; i < 3; i++) {
 			
-			if (colorMatchesLinker[0] == faceColorIndex[linkerMatchFace]) {
+			linkPieceOutsideFaceColor = getFaceColor(linkPieceIndices, outsideFaceIndicesLink[i][1]);
+		
+			if ((linkPieceOutsideFaceColor != colorMatchOne) || (linkPieceOutsideFaceColor != colorMatchTwo)) {
 				
-				break;
+				break;		//linkPieceOutsideFaceColor is the non-matched color. Break out of the loop.
 				
 			}
 			
 		}
 		
-		//Map the other two positions based on the linker cube
-		
-		//Fill in the final color based on the missing color from the opposite corner cube
+		//Get world solved face of the non-matched color of the first piece
 		
 		
-	} else if (colorMatchesLinker.length == 2) {		//Two colors match to the rear bottom left corner, the other one matches to the opposite corner
+		//Get opposite world face of above face
+		//Map the color in faceColors
 		
+	} else {
 		
-		
-	} else {			//Something went wrong, throw an error alert
-			
-		alert("Error: Invalid number of color matches from cornerColorMatches in mapOppositeCorners: " + colorMatchesLinker.length + " matches. Expected: 1 or 2.");
+		alert("Invalid number of color matches between pieces: " + cubeOneIndices + " and " + linkPieceIndices + ". Expected 1 or 2, got " + colorMatches.length);
 		
 	}
-	*/
+
 }
 
 //Returns the solved position of the piece in cubeArray to be stored in piecePositions
